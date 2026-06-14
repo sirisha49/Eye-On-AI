@@ -33,41 +33,7 @@ The result: one final verdict — **Pass, Review, or Fail** — backed by a full
 
 ## Architecture
 
-```
-User question
-      │
-      ▼
-Azure OpenAI (GPT-4o) + Foundry IQ retrieval
-      │
-      ▼
-   AI answer
-      │
-   ┌──┴──────────────────────┐
-   ▼                          ▼
-Layer 1: Rules Engine     Layer 2: Evaluator Agent
-(deterministic, no LLM)   (Azure OpenAI GPT-4o-mini,
-checks against evidence    independent judge, no
-chunks)                    evidence chunks)
-   │                          │
-   ▼                          ▼
-Math Score Report        Agent Evaluation Report
-   │                          │
-   └──────────┬───────────────┘
-              ▼
-       Comparison Check
-   (delta > 25pts → low confidence,
-    pattern-tagged disagreements)
-              │
-              ▼
-       Comparison Report
-              │
-        + Fabric IQ
-     (historical trends)
-              │
-              ▼
-    Overall Trust Verdict
-     Pass / Review / Fail
-```
+![EyeOnAI Architecture](Architecture.png)
 
 ---
 
@@ -130,6 +96,8 @@ The overall verdict is derived from the **trust score** directly — not from th
 ---
 
 ## Scoring Methodology
+
+![Scoring Methodology](combined_layers.png)
 
 ### Layer 1 — Rules Engine *(deterministic, no LLM)*
 
@@ -303,9 +271,45 @@ open http://localhost:5001
 
 ---
 
+## Output
+
+### Home
+
+![Home](output/Scene%201.png)
+
+### Chat — Live answers with trust verdicts
+
+![Chat](output/Scene%202.png)
+
+### Math Score Tab — Layer 1 Rules Engine
+
+![Math Score](output/Scene%203.png)
+
+### Agent Evaluation Tab — Layer 2 Independent Judge
+
+![Agent Evaluation](output/Scene%204.png)
+
+### Comparison Tab — Layer delta and disagreement analysis
+
+![Comparison](output/Scene%205.png)
+
+### Dashboard — Aggregate trends powered by Fabric IQ
+
+![Dashboard](output/Dashboard.png)
+
+### Other Scenarios
+
+![Other Scenario 1](output/Other%20Scenario%201.png)
+
+![Other Scenario 2](output/Other%20Scenario%202.png)
+
+![Other Scenario 3](output/Other%20Scenario%203.png)
+
+---
+
 ## Demo
 
-🔗 **[Watch the demo](#)**
+🔗 **[Watch the demo](https://www.youtube.com/watch?v=_I6tQqxHOqs)**
 
 ---
 
