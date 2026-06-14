@@ -33,7 +33,7 @@ The result: one final verdict — **Pass, Review, or Fail** — backed by a full
 
 ## Architecture
 
-![EyeOnAI Architecture](output/Architecture.png)
+![EyeOnAI Architecture](Output/Architecture.png)
 
 ---
 
@@ -97,7 +97,7 @@ The overall verdict is derived from the **trust score** directly — not from th
 
 ## Scoring Methodology
 
-![Scoring Methodology](output/combined_layers.png)
+![Scoring Methodology](Output/combined_layers.png)
 
 ### Layer 1 — Rules Engine *(deterministic, no LLM)*
 
@@ -275,35 +275,35 @@ open http://localhost:5001
 
 ### Home
 
-![Home](output/Scene%201.png)
+![Home](Output/Scene%201.png)
 
 ### Chat — Live answers with trust verdicts
 
-![Chat](output/Scene%202.png)
+![Chat](Output/Scene%202.png)
 
 ### Math Score Tab — Layer 1 Rules Engine
 
-![Math Score](output/Scene%203.png)
+![Math Score](Output/Scene%203.png)
 
 ### Agent Evaluation Tab — Layer 2 Independent Judge
 
-![Agent Evaluation](output/Scene%204.png)
+![Agent Evaluation](Output/Scene%204.png)
 
 ### Comparison Tab — Layer delta and disagreement analysis
 
-![Comparison](output/Scene%205.png)
+![Comparison](Output/Scene%205.png)
 
 ### Dashboard — Aggregate trends powered by Fabric IQ
 
-![Dashboard](output/Dashboard.png)
+![Dashboard](Output/Dashboard.png)
 
 ### Other Scenarios
 
-![Other Scenario 1](output/Other%20Scenario%201.png)
+![Other Scenario 1](Output/Other%20Scenario%201.png)
 
-![Other Scenario 2](output/Other%20Scenario%202.png)
+![Other Scenario 2](Output/Other%20Scenario%202.png)
 
-![Other Scenario 3](output/Other%20Scenario%203.png)
+![Other Scenario 3](Output/Other%20Scenario%203.png)
 
 ---
 
