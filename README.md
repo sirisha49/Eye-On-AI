@@ -313,12 +313,6 @@ open http://localhost:5001
 
 ---
 
-## License
-
-MIT
-
----
-
 *Sometimes the most confident-sounding answer is the one you should trust the least — and honestly, that's true for AI, and maybe for people too.*
 
 *I wanted an observer for my AI. Now I have one.*
