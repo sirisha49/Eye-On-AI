@@ -1,0 +1,3007 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EyeOnAI — AI Trust & Observability</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg:       #FFFDF5;
+  --bg2:      #FFFDF5;
+  --card:     #FFF8E1;
+  --border:   #E8E6E1;
+  --accent:   #2563EB;
+  --accent-bg:#EFF6FF;
+  --success:  #16A34A;
+  --warning:  #D97706;
+  --danger:   #DC2626;
+  --amber:    #D97706;
+  --purple:   #7C3AED;
+  --muted:    #6B7280;
+  --text:     #1A1A1A;
+  --text2:    #374151;
+  --teal-bg:  #F0FDFA;
+  --teal-border: #5EEAD4;
+  --purple-bg: #FAF5FF;
+  --purple-border: #C4B5FD;
+  --radius:   8px;
+  --radius-lg: 12px;
+}
+html, body { height: 100%; }
+body { font-family: 'Inter', system-ui, sans-serif; background: #FFFDF5; color: var(--text); font-size: 14px; line-height: 1.5; overflow: hidden; }
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #C9C7C0; }
+
+/* Header */
+header { height: 52px; background: #FFFDF5; box-shadow: 0 1px 2px rgba(0,0,0,0.04); display: flex; align-items: center; padding: 0 24px; position: relative; z-index: 10; }
+.logo { display: flex; align-items: center; gap: 9px; font-size: 16px; font-weight: 700; margin-right: 32px; color: var(--text); letter-spacing: -0.02em; text-decoration: none; }
+nav { display: flex; gap: 0; flex: 1; height: 100%; }
+nav button { padding: 0 16px; height: 100%; background: transparent; border: none; border-bottom: 2px solid transparent; color: var(--muted); font-size: 13px; font-weight: 500; cursor: pointer; transition: all .15s; font-family: inherit; }
+nav button:hover { color: var(--text); }
+nav button.active { color: var(--accent); border-bottom-color: var(--accent); font-weight: 600; }
+.header-tag { font-size: 11px; padding: 3px 10px; border-radius: 20px; background: var(--accent-bg); color: var(--accent); font-weight: 600; letter-spacing: .01em; margin-left: auto; }
+
+/* Layout */
+.tab-content { display: none; height: calc(100vh - 52px); }
+.tab-content.active { display: flex; }
+#chat-tab { overflow: hidden; }
+#math-score-tab { flex-direction: column; overflow: hidden; }
+#dashboard-tab { flex-direction: column; overflow: hidden; }
+
+/* Chat panel */
+.chat-panel { flex: 1; display: flex; flex-direction: column; background: #FFE082; }
+.chat-header { padding: 16px 20px 12px; }
+.chat-header h2 { font-size: 14px; font-weight: 600; color: var(--text); }
+.chat-header p { font-size: 12px; color: var(--muted); margin-top: 2px; }
+.chat-messages { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+.chat-empty { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; color: var(--muted); gap: 0; text-align: center; padding: 40px 24px; }
+.chat-empty-icon { width: 48px; height: 48px; background: var(--accent-bg); border-radius: 12px; display: flex; align-items: center; justify-content: center; }
+.chat-empty h3 { font-size: 15px; font-weight: 600; color: var(--text); }
+.chat-empty p { font-size: 12px; max-width: 300px; color: var(--muted); line-height: 1.6; }
+.example-chips { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; margin-top: 6px; }
+.chip { padding: 5px 12px; background: #FFF8E1; border-radius: 20px; font-size: 12px; color: var(--text2); cursor: pointer; transition: box-shadow .15s; box-shadow: 0 1px 2px rgba(0,0,0,0.04); }
+.chip:hover { color: var(--accent); background: var(--accent-bg); box-shadow: 0 2px 8px rgba(37,99,235,0.12); }
+
+/* Messages */
+.msg { display: flex; flex-direction: column; gap: 6px; }
+.msg-q { background: #E8EAF6; border-radius: var(--radius-lg) var(--radius-lg) var(--radius-lg) 4px; padding: 10px 14px; color: #3949AB; font-size: 13px; align-self: flex-end; max-width: 88%; }
+.msg-a-wrap { display: flex; flex-direction: column; gap: 8px; align-self: flex-start; max-width: 96%; }
+.msg-a { background: #FFF8E1; border-radius: 4px var(--radius-lg) var(--radius-lg) var(--radius-lg); padding: 12px 14px; color: #2C2C2A; font-size: 13px; line-height: 1.6; cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.05), 0 4px 12px rgba(0,0,0,0.04); transition: box-shadow .15s; }
+.msg-a:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.08), 0 6px 16px rgba(0,0,0,0.06); }
+.msg-a.active { box-shadow: 0 0 0 3px rgba(37,99,235,0.12), 0 4px 12px rgba(37,99,235,0.08); }
+.msg-meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.isc-row { display: flex; gap: 8px; margin: 4px 0 2px; align-items: center; flex-wrap: wrap; }
+.isc-pill { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 400; color: #2C2C2A; cursor: pointer; padding: 9px 18px; border-radius: 999px; background: #FFF8E1; transition: box-shadow 0.15s ease; white-space: nowrap; box-shadow: 0 1px 2px rgba(0,0,0,0.04), 0 3px 8px rgba(0,0,0,0.04); }
+.isc-pill:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.10), 0 6px 16px rgba(0,0,0,0.06); }
+.isc-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; animation: glow-pulse 2.5s ease-in-out infinite; }
+.isc-dot-green  { background: #22C55E; box-shadow: 0 0 0 3px rgba(34,197,94,0.2),  0 0 8px rgba(34,197,94,0.35); }
+.isc-dot-amber  { background: #F59E0B; box-shadow: 0 0 0 3px rgba(245,158,11,0.2), 0 0 8px rgba(245,158,11,0.35); }
+.isc-dot-red    { background: #EF4444; box-shadow: 0 0 0 3px rgba(239,68,68,0.2),  0 0 8px rgba(239,68,68,0.35); }
+.trust-badge { display: inline-flex; align-items: center; gap: 4px; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+.trust-green  { background: #F0FDF4; color: var(--success); }
+.trust-yellow { background: #FFFBEB; color: var(--warning); }
+.trust-red    { background: #FEF2F2; color: var(--danger);  }
+.verdict-badge { display: inline-flex; align-items: center; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 700; letter-spacing: .04em; }
+.verdict-PASS   { background: #F0FDF4; color: var(--success); }
+.verdict-FAIL   { background: #FEF2F2; color: var(--danger);  }
+.verdict-REVIEW { background: #FFFBEB; color: var(--warning); }
+.iq-badges { display: flex; gap: 5px; }
+.iq-badge { font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 4px; letter-spacing: .01em; }
+.iq-active   { background: var(--accent-bg); color: var(--accent); }
+.iq-inactive { background: var(--bg); color: var(--muted); opacity: .6; }
+.msg-actions { display: flex; align-items: center; gap: 6px; }
+.feedback-btn { width: 28px; height: 28px; border-radius: 6px; background: #FFF8E1; color: var(--muted); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: box-shadow .15s; box-shadow: 0 1px 2px rgba(0,0,0,0.04); }
+.feedback-btn:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.10); color: var(--text); }
+.feedback-btn.up-active   { color: var(--success); background: #F0FDF4; }
+.feedback-btn.down-active { color: var(--danger);  background: #FEF2F2; }
+.trace-link { font-size: 11px; color: var(--accent); cursor: pointer; text-decoration: none; margin-left: auto; font-weight: 500; }
+.trace-link:hover { text-decoration: underline; }
+.thinking { display: flex; gap: 6px; align-items: center; padding: 10px 14px; background: #FFF8E1; border-radius: 4px var(--radius-lg) var(--radius-lg) var(--radius-lg); color: var(--muted); font-size: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.05), 0 4px 12px rgba(0,0,0,0.04); }
+.dot { width: 5px; height: 5px; border-radius: 50%; background: var(--accent); animation: pulse 1.4s ease-in-out infinite; }
+.dot:nth-child(2) { animation-delay: .2s; }
+.dot:nth-child(3) { animation-delay: .4s; }
+@keyframes pulse { 0%,80%,100%{opacity:.2;transform:scale(.8)} 40%{opacity:1;transform:scale(1)} }
+@keyframes glow-pulse { 0%,100%{transform:scale(1);opacity:1} 50%{transform:scale(1.18);opacity:0.75} }
+.mac-card { background: #FFF8E1; border-radius: 14px; box-shadow: 0 1px 2px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.04); }
+.mac-card-nested { background: #FFFDF5; border-radius: 10px; box-shadow: inset 0 1px 2px rgba(0,0,0,0.05); }
+.mac-card-clickable { cursor: pointer; transition: box-shadow 0.15s ease; }
+.mac-card-clickable:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.10), 0 6px 16px rgba(0,0,0,0.06); }
+
+/* Chat input */
+.chat-input-wrap { padding: 12px 16px; box-shadow: 0 -1px 0 rgba(0,0,0,0.04); display: flex; gap: 8px; background: #FFE082; }
+#question-input { flex: 1; padding: 9px 13px; background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); color: var(--text); font-size: 13px; outline: none; transition: border-color .15s; font-family: inherit; }
+#question-input::placeholder { color: var(--muted); }
+#question-input:focus { border-color: var(--accent); background: var(--card); }
+#send-btn { padding: 9px 16px; background: var(--accent); color: white; border: none; border-radius: var(--radius); font-size: 13px; font-weight: 600; cursor: pointer; transition: background .15s; white-space: nowrap; font-family: inherit; }
+#send-btn:hover { background: #1D4ED8; }
+#send-btn:disabled { opacity: .5; cursor: not-allowed; }
+
+/* Report panel */
+.report-panel { flex: 1; display: flex; flex-direction: column; overflow: hidden; background: var(--bg); }
+.report-empty { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; color: var(--muted); gap: 12px; text-align: center; padding: 20px; }
+.report-empty-icon { width: 48px; height: 48px; background: #FFF8E1; border-radius: 12px; display: flex; align-items: center; justify-content: center; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+.report-empty p { font-size: 12px; max-width: 260px; line-height: 1.6; }
+
+/* Sticky report header */
+.report-sticky { position: sticky; top: 0; z-index: 5; background: #FFF8E1; box-shadow: 0 1px 2px rgba(0,0,0,0.04); padding: 10px 20px; display: flex; align-items: center; gap: 12px; }
+.report-sticky-score { font-size: 22px; font-weight: 800; letter-spacing: -0.02em; }
+.report-sticky-label { font-size: 10px; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: .06em; }
+.report-sticky-q { font-size: 12px; color: var(--text2); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.download-btn { padding: 5px 12px; background: #FFF8E1; border-radius: var(--radius); color: var(--muted); font-size: 12px; cursor: pointer; transition: box-shadow .15s; white-space: nowrap; font-family: inherit; box-shadow: 0 1px 2px rgba(0,0,0,0.04); }
+.download-btn:hover { color: var(--accent); box-shadow: 0 2px 8px rgba(37,99,235,0.12); }
+
+.report-inner { flex: 1; overflow-y: auto; padding: 20px; }
+
+/* Sections */
+.section { background: #FFF8E1; border-radius: var(--radius-lg); margin-bottom: 10px; overflow: hidden; box-shadow: 0 1px 2px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.04); }
+.section-head { display: flex; align-items: center; gap: 8px; padding: 11px 16px; cursor: pointer; user-select: none; }
+.section-head:hover { background: var(--bg); }
+.section-head h3 { font-size: 12px; font-weight: 600; color: var(--text); flex: 1; }
+.sec-icon { color: var(--muted); display: flex; }
+.chevron { color: var(--muted); display: flex; transition: transform .2s; }
+.section.collapsed .chevron { transform: rotate(-90deg); }
+.section-body { padding: 0 16px 14px; }
+.section.collapsed .section-body { display: none; }
+
+/* Overall score */
+.score-circle-wrap { display: flex; align-items: center; gap: 20px; padding: 14px 0 8px; }
+.score-circle { width: 88px; height: 88px; flex-shrink: 0; }
+.score-meta { flex: 1; }
+.score-meta .big-score { font-size: 36px; font-weight: 800; line-height: 1; letter-spacing: -0.03em; }
+.score-meta .big-label { font-size: 10px; color: var(--muted); margin-top: 3px; margin-bottom: 8px; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; }
+.powered-by { font-size: 10px; color: var(--muted); margin-top: 8px; }
+
+/* Two-column scoring */
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding-top: 4px; }
+.score-col { display: flex; flex-direction: column; gap: 8px; padding: 12px; border-radius: var(--radius); box-shadow: inset 0 1px 2px rgba(0,0,0,0.04); }
+.score-col-teal   { background: var(--teal-bg); }
+.score-col-purple { background: var(--purple-bg); }
+.col-label { font-size: 10px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 4px; }
+.score-row { display: flex; flex-direction: column; gap: 3px; }
+.score-row-head { display: flex; align-items: center; justify-content: space-between; }
+.score-name { font-size: 11px; color: var(--text2); font-weight: 500; }
+.score-num { font-size: 11px; font-weight: 700; }
+.score-bar { height: 4px; background: var(--border); border-radius: 2px; overflow: hidden; margin-top: 2px; }
+.score-fill { height: 100%; border-radius: 2px; transition: width .6s ease; }
+.fill-green  { background: var(--success); }
+.fill-yellow { background: var(--warning); }
+.fill-red    { background: var(--danger);  }
+.score-reason { font-size: 10px; color: var(--muted); line-height: 1.4; margin-top: 1px; }
+
+/* Disagreement */
+.disagree-box { border-left: 3px solid var(--amber); background: #FFFBEB; border-radius: 0 var(--radius) var(--radius) 0; padding: 12px 14px; margin-bottom: 12px; }
+.disagree-title { font-size: 11px; font-weight: 700; color: var(--amber); margin-bottom: 8px; }
+.disagree-item { font-size: 11px; color: var(--text2); line-height: 1.6; margin-bottom: 6px; padding-bottom: 6px; border-bottom: 1px solid #FDE68A; }
+.disagree-item:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+.disagree-scores { display: flex; gap: 8px; margin-top: 4px; }
+.dscore { font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 4px; }
+.dscore-rules { background: var(--accent-bg); color: var(--accent); }
+.dscore-eval  { background: #FEF2F2; color: var(--danger); }
+
+/* Evidence chunks */
+.chunk-card { background: #FFFDF5; border-radius: var(--radius); padding: 10px 12px; margin-bottom: 8px; box-shadow: inset 0 1px 2px rgba(0,0,0,0.04); }
+.chunk-head { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+.chunk-id { font-size: 10px; font-weight: 700; color: var(--accent); font-family: monospace; }
+.chunk-src { font-size: 10px; color: var(--muted); flex: 1; }
+.chunk-used { font-size: 10px; font-weight: 600; }
+.sim-bar-wrap { display: flex; align-items: center; gap: 6px; margin-bottom: 6px; }
+.sim-bar { height: 4px; background: var(--border); border-radius: 2px; flex: 1; overflow: hidden; }
+.sim-fill { height: 100%; border-radius: 2px; }
+.sim-val { font-size: 10px; color: var(--success); font-weight: 600; min-width: 32px; }
+.chunk-content { font-size: 11px; color: var(--text2); line-height: 1.5; }
+.chunk-toggle { font-size: 10px; color: var(--accent); cursor: pointer; margin-top: 4px; display: inline-block; font-weight: 500; }
+.chunk-content.collapsed { max-height: 40px; overflow: hidden; }
+.no-evidence { background: #FFFBEB; border-left: 3px solid var(--warning); border-radius: 0 var(--radius) var(--radius) 0; padding: 10px 12px; font-size: 12px; color: var(--warning); font-weight: 500; }
+
+/* KV grid */
+.kv-grid { display: grid; grid-template-columns: auto 1fr; gap: 5px 12px; }
+.kv-key { font-size: 11px; color: var(--muted); font-weight: 500; white-space: nowrap; }
+.kv-val { font-size: 11px; color: var(--text2); word-break: break-word; }
+
+/* Pipeline */
+.span-row { display: flex; align-items: center; gap: 10px; padding: 7px 0; border-bottom: 1px solid var(--border); }
+.span-row:last-child { border-bottom: none; }
+.span-dot2 { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+.dot-ok      { background: var(--success); }
+.dot-warning { background: var(--warning); }
+.dot-error   { background: var(--danger);  }
+.span-name2  { font-size: 12px; font-weight: 500; flex: 1; }
+.span-iq2 { font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 4px; background: var(--accent-bg); color: var(--accent); }
+.span-dur2 { font-size: 11px; color: var(--muted); min-width: 50px; text-align: right; font-variant-numeric: tabular-nums; }
+
+/* Fabric IQ */
+.fabric-insight { padding: 10px 12px; border-radius: var(--radius); margin-bottom: 8px; border-left: 3px solid; }
+.fi-high   { background: #FEF2F2; border-color: var(--danger); }
+.fi-medium { background: #FFFBEB; border-color: var(--warning); }
+.fi-low    { background: #F0FDF4; border-color: var(--success); }
+.fi-title  { font-size: 11px; font-weight: 700; margin-bottom: 2px; }
+.fi-high .fi-title   { color: var(--danger);  }
+.fi-medium .fi-title { color: var(--warning); }
+.fi-low .fi-title    { color: var(--success); }
+.fi-detail { font-size: 11px; color: var(--text2); line-height: 1.5; }
+
+/* Flags */
+.flag-item { display: flex; gap: 8px; align-items: flex-start; background: #FEF2F2; border-left: 3px solid var(--danger); border-radius: 0 var(--radius) var(--radius) 0; padding: 8px 10px; margin-bottom: 6px; }
+.flag-icon { color: var(--danger); flex-shrink: 0; margin-top: 1px; font-size: 12px; }
+.flag-text { font-size: 11px; color: var(--text2); line-height: 1.5; }
+.flag-rule { font-weight: 700; color: var(--danger); }
+.no-flags { font-size: 12px; color: var(--success); display: flex; align-items: center; gap: 6px; padding: 10px 12px; background: #F0FDF4; border-radius: var(--radius); font-weight: 500; box-shadow: inset 0 1px 2px rgba(0,0,0,0.03); }
+
+/* Tips */
+.tip-item { font-size: 12px; color: var(--text2); padding: 7px 0; border-bottom: 1px solid var(--border); display: flex; gap: 8px; }
+.tip-item:last-child { border-bottom: none; }
+.tip-icon { color: var(--accent); flex-shrink: 0; font-weight: 700; }
+.learn-msg { font-size: 11px; color: var(--muted); margin-top: 10px; text-align: center; line-height: 1.6; }
+
+/* Dashboard */
+.dash-inner { flex: 1; overflow-y: auto; padding: 24px 28px; }
+.stats-row { display: flex; gap: 12px; margin-bottom: 24px; flex-wrap: wrap; }
+.stat-card { background: #FFF8E1; border-radius: var(--radius-lg); padding: 16px 20px; flex: 1; min-width: 120px; display: flex; flex-direction: column; gap: 4px; box-shadow: 0 1px 2px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.04); }
+.stat-val { font-size: 28px; font-weight: 800; letter-spacing: -0.02em; }
+.stat-label { font-size: 11px; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: .06em; }
+.stat-sub { font-size: 11px; color: var(--muted); }
+.stat-red   { color: var(--danger);  }
+.stat-yellow{ color: var(--warning); }
+.stat-green { color: var(--success); }
+.stat-blue  { color: var(--accent);  }
+.section-title2 { font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .08em; margin: 20px 0 10px; }
+.insights-row { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+.insight-card { flex: 1; min-width: 200px; padding: 12px 14px; border-radius: var(--radius); border-left: 3px solid; background: #FFF8E1; display: flex; flex-direction: column; gap: 4px; box-shadow: 0 1px 2px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.04); }
+.insight-high   { border-left-color: var(--danger);  }
+.insight-medium { border-left-color: var(--warning); }
+.insight-low    { border-left-color: var(--success); }
+.insight-title  { font-size: 12px; font-weight: 700; }
+.insight-high .insight-title   { color: var(--danger);  }
+.insight-medium .insight-title { color: var(--warning); }
+.insight-low .insight-title    { color: var(--success); }
+.insight-detail { font-size: 11px; color: var(--text2); line-height: 1.5; }
+.filter-bar { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; flex-wrap: wrap; }
+.filter-bar label { font-size: 12px; color: var(--muted); font-weight: 500; }
+.filter-bar select { background: #FFF8E1; border-radius: var(--radius); color: var(--text); padding: 5px 10px; font-size: 12px; outline: none; cursor: pointer; font-family: inherit; box-shadow: 0 1px 2px rgba(0,0,0,0.04); }
+.filter-bar select:focus { border-color: var(--accent); }
+.result-count { font-size: 11px; color: var(--muted); margin-left: auto; }
+.table-wrap { background: #FFF8E1; border-radius: var(--radius-lg); overflow: hidden; margin-bottom: 24px; box-shadow: 0 1px 2px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.04); }
+table { width: 100%; border-collapse: collapse; }
+thead tr { background: var(--bg); border-bottom: 1px solid var(--border); }
+th { padding: 10px 12px; text-align: left; font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; white-space: nowrap; }
+tbody tr { border-bottom: 1px solid var(--border); transition: background .1s; cursor: pointer; }
+tbody tr:last-child { border-bottom: none; }
+tbody tr:hover { background: var(--bg); }
+td { padding: 10px 12px; font-size: 12px; vertical-align: middle; }
+.td-question { max-width: 220px; }
+.td-question-text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--text); }
+.td-intent { font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 4px; text-transform: uppercase; letter-spacing: .05em; white-space: nowrap; }
+.intent-science    { background: var(--purple-bg); color: var(--purple); }
+.intent-health     { background: #F0FDF4; color: var(--success); }
+.intent-finance    { background: var(--accent-bg); color: var(--accent); }
+.intent-legal      { background: #FFFBEB; color: var(--warning); }
+.intent-technology { background: var(--teal-bg); color: #0F766E; }
+.intent-career     { background: #F0FDF4; color: var(--success); }
+.intent-psychology { background: var(--purple-bg); color: var(--purple); }
+.intent-history    { background: var(--bg2); color: var(--muted); }
+.intent-business   { background: var(--accent-bg); color: var(--accent); }
+.intent-general    { background: var(--bg2); color: var(--muted); }
+.flag-pill { display: inline-flex; align-items: center; gap: 4px; font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 4px; background: #FEF2F2; color: var(--danger); white-space: nowrap; }
+.iq-dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; margin-right: 4px; vertical-align: middle; }
+.iq-dot-on  { background: var(--success); }
+.iq-dot-off { background: var(--border); }
+.empty-table { text-align: center; padding: 40px; color: var(--muted); font-size: 13px; }
+
+/* Evaluator Agent section */
+.eval-verdict-banner { display: flex; align-items: center; gap: 14px; padding: 14px 16px; border-radius: var(--radius); margin-bottom: 14px; box-shadow: inset 0 1px 2px rgba(0,0,0,0.03); }
+.eval-verdict-banner.banner-PASS   { background: #F0FDF4; }
+.eval-verdict-banner.banner-FAIL   { background: #FEF2F2; }
+.eval-verdict-banner.banner-REVIEW { background: #FFFBEB; }
+.eval-verdict-icon { width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.eval-verdict-icon-PASS   { background: #DCFCE7; color: var(--success); }
+.eval-verdict-icon-FAIL   { background: #FEE2E2; color: var(--danger);  }
+.eval-verdict-icon-REVIEW { background: #FEF9C3; color: var(--warning); }
+.eval-verdict-label { font-size: 15px; font-weight: 800; letter-spacing: .01em; }
+.eval-verdict-PASS   { color: var(--success); }
+.eval-verdict-FAIL   { color: var(--danger);  }
+.eval-verdict-REVIEW { color: var(--warning); }
+.eval-meta { font-size: 11px; color: var(--muted); margin-top: 1px; }
+.eval-summary { font-size: 12px; color: var(--text2); line-height: 1.65; padding: 10px 12px; background: var(--purple-bg); border-radius: var(--radius); margin-bottom: 10px; box-shadow: inset 0 1px 2px rgba(0,0,0,0.03); }
+.eval-scores { display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px; }
+.eval-missed { padding: 10px 12px; background: #FFFBEB; border-left: 3px solid var(--amber); border-radius: 0 var(--radius) var(--radius) 0; margin-top: 10px; }
+.eval-missed-label { font-size: 10px; font-weight: 700; color: var(--amber); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 4px; }
+.eval-missed-text { font-size: 11px; color: var(--text2); line-height: 1.55; }
+
+/* Confidence Assessment section */
+.confidence-layers { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+.confidence-layer { background: #FFFDF5; border-radius: var(--radius); padding: 12px 14px; box-shadow: inset 0 1px 2px rgba(0,0,0,0.04); }
+.confidence-layer-label { font-size: 10px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 6px; }
+.confidence-value { font-size: 26px; font-weight: 800; letter-spacing: -0.02em; line-height: 1; margin-bottom: 4px; }
+.confidence-sublabel { font-size: 10px; color: var(--muted); }
+.confidence-badge { display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border-radius: 20px; font-size: 11px; font-weight: 700; margin-bottom: 10px; }
+.confidence-HIGH { background: #F0FDF4; color: var(--success); }
+.confidence-LOW  { background: #FFFBEB; color: var(--amber); }
+.confidence-interp { font-size: 12px; color: var(--text2); line-height: 1.6; }
+.confidence-delta { font-size: 11px; color: var(--muted); margin-bottom: 8px; }
+
+/* Sentence analysis cards */
+.sent-card { background: #FFFDF5; border-radius: var(--radius); padding: 10px 12px; margin-bottom: 8px; box-shadow: inset 0 1px 2px rgba(0,0,0,0.04); }
+.sent-card:last-child { margin-bottom: 0; }
+.sent-header { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+.sent-verdict { display: inline-flex; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 700; letter-spacing: .04em; flex-shrink: 0; }
+.sent-SUPPORTED    { background: #F0FDF4; color: var(--success); }
+.sent-PARTIAL      { background: #FFFBEB; color: var(--warning); }
+.sent-UNVERIFIED   { background: var(--bg2); color: var(--muted); }
+.sent-CONTRADICTION { background: #FEF2F2; color: var(--danger); }
+.sent-chunk-ref { font-size: 10px; color: var(--accent); font-weight: 600; font-family: monospace; margin-left: auto; }
+.sent-text { font-size: 12px; color: var(--text2); line-height: 1.5; margin-bottom: 6px; }
+.sent-scores { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+.sent-score-pill { font-size: 10px; color: var(--muted); display: flex; gap: 3px; align-items: center; }
+.sent-score-val { font-weight: 700; }
+.sent-claim-verified   { font-size: 10px; font-weight: 600; color: var(--success); }
+.sent-claim-unverified { font-size: 10px; font-weight: 600; color: var(--danger); }
+.sent-analysis-summary { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; font-size: 11px; }
+.sent-count-pill { padding: 3px 10px; border-radius: 20px; font-weight: 600; font-size: 10px; }
+
+/* Toast */
+#toast { position: fixed; bottom: 24px; right: 24px; padding: 10px 16px; background: var(--text); border-radius: var(--radius); color: white; font-size: 13px; z-index: 100; transform: translateY(60px); opacity: 0; transition: all .25s ease; box-shadow: 0 4px 24px rgba(0,0,0,.15); }
+#toast.show { transform: translateY(0); opacity: 1; }
+
+/* Disagreement — Root-cause analysis */
+.dg-rootcause-section { margin-top: 18px; }
+.dg-rootcause-title { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; color: var(--text2); margin-bottom: 14px; display: flex; align-items: center; gap: 8px; padding-top: 16px; }
+.dg-rootcause-item { margin-bottom: 14px; }
+.dg-rootcause-hd { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+.dg-rootcause-dim { font-size: 13px; font-weight: 700; color: var(--text); text-transform: capitalize; }
+.dg-rootcause-scores { font-size: 11px; color: var(--muted); }
+.dg-rootcause-callout { background: #FFFBEB; border-left: 3px solid #D97706; border-radius: var(--radius); padding: 12px 14px; margin-bottom: 8px; font-size: 12px; color: var(--text2); line-height: 1.75; }
+.dg-cause-badge { display: inline-flex; align-items: center; gap: 4px; font-size: 10px; font-weight: 700; padding: 2px 9px; border-radius: 20px; background: #F3F4F6; color: #374151; text-transform: uppercase; letter-spacing: .04em; }
+.dg-evidence-list { margin-top: 8px; display: flex; flex-direction: column; gap: 4px; }
+.dg-evidence-item { padding: 8px 10px; background: #FEF2F2; border-radius: var(--radius); box-shadow: inset 0 1px 2px rgba(0,0,0,0.03); }
+.dg-evidence-sent { font-size: 11px; color: var(--text2); line-height: 1.6; }
+.dg-evidence-meta { font-size: 10px; color: var(--muted); margin-top: 3px; }
+
+/* Disagreement Tab */
+#disagreement-tab { flex-direction: column; overflow: hidden; }
+.dg-inner { display: flex; flex-direction: column; gap: 12px; }
+.dg-confidence-banner { display: flex; align-items: center; gap: 14px; padding: 20px 24px; border-radius: var(--radius-lg); margin-bottom: 20px; box-shadow: 0 1px 2px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.04); }
+.dg-confidence-banner.high { background: #F0FDF4; }
+.dg-confidence-banner.low  { background: #FFFBEB; }
+.dg-banner-icon { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.dg-confidence-banner.high .dg-banner-icon { background: #DCFCE7; }
+.dg-confidence-banner.low  .dg-banner-icon { background: #FEF3C7; }
+.dg-banner-title { font-size: 17px; font-weight: 800; letter-spacing: -0.02em; }
+.dg-confidence-banner.high .dg-banner-title { color: #15803D; }
+.dg-confidence-banner.low  .dg-banner-title { color: #B45309; }
+.dg-banner-sub { font-size: 12px; margin-top: 1px; }
+.dg-confidence-banner.high .dg-banner-sub { color: #16A34A; }
+.dg-confidence-banner.low  .dg-banner-sub { color: #D97706; }
+.dg-compare-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; align-items: stretch; }
+.dg-layer-card { background: #FFF8E1; border-radius: var(--radius-lg); padding: 18px; box-shadow: 0 1px 2px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.04); }
+.dg-layer-pill { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 20px; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 8px; }
+.dg-pill-rules { background: var(--teal-bg); color: #0D9488; }
+.dg-pill-eval  { background: var(--purple-bg); color: var(--purple); }
+.dg-layer-title { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 3px; }
+.dg-layer-sub   { font-size: 11px; color: var(--muted); line-height: 1.5; margin-bottom: 16px; }
+.dg-metric-lbl  { font-size: 11px; font-weight: 600; color: var(--text2); margin-bottom: 6px; }
+.dg-metric-row  { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+.dg-bar-track   { flex: 1; height: 10px; background: var(--border); border-radius: 5px; overflow: hidden; }
+.dg-bar-fill    { height: 100%; border-radius: 5px; transition: width .4s ease; }
+.dg-bar-pct     { font-size: 15px; font-weight: 700; width: 42px; text-align: right; flex-shrink: 0; }
+.dg-delta-card  { background: #FFF8E1; border-radius: var(--radius-lg); padding: 6px 18px; margin-bottom: 14px; box-shadow: 0 1px 2px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.04); }
+.dg-delta-row   { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--border); }
+.dg-delta-row:last-child { border-bottom: none; }
+.dg-delta-lbl   { font-size: 12px; font-weight: 600; color: var(--text2); flex: 1; }
+.dg-delta-num   { font-size: 20px; font-weight: 800; }
+.dg-delta-badge { display: flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px; }
+.dg-delta-ok    { background: #F0FDF4; color: #16A34A; }
+.dg-delta-warn  { background: #FFFBEB; color: #D97706; }
+.dg-interp-card { background: var(--accent-bg); border-radius: var(--radius-lg); padding: 18px 20px; margin-bottom: 14px; box-shadow: 0 1px 2px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.04); }
+.dg-interp-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: var(--accent); margin-bottom: 8px; }
+.dg-interp-text  { font-size: 14px; font-weight: 500; color: var(--text); line-height: 1.7; }
+.dg-reason-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; align-items: stretch; }
+.dg-reason-card { background: #FFF8E1; border-radius: var(--radius-lg); padding: 14px 16px; box-shadow: 0 1px 2px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.04); }
+.dg-reason-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin-bottom: 8px; }
+.dg-reason-text  { font-size: 12px; color: var(--text2); line-height: 1.75; }
+
+/* Agent Evaluation Tab */
+#agent-eval-tab { flex-direction: column; overflow: hidden; }
+.ae-trace-bar { display: flex; align-items: center; gap: 10px; padding: 10px 24px; box-shadow: 0 1px 2px rgba(0,0,0,0.04); background: #FFF8E1; font-size: 12px; color: var(--muted); flex-shrink: 0; }
+.ae-trace-bar select { font-size: 12px; padding: 4px 10px; border-radius: var(--radius); background: #FFFDF5; color: var(--text); font-family: inherit; cursor: pointer; box-shadow: inset 0 1px 2px rgba(0,0,0,0.04); }
+.ae-scroll { flex: 1; overflow-y: auto; padding: 16px 16px 24px; }
+#ae-scroll { background: #FFE082; }
+#dg-scroll { background: #FFE082; }
+.ae-inner { display: flex; flex-direction: column; gap: 12px; }
+.ae-empty { display: flex; flex-direction: column; align-items: center; justify-content: center; height: calc(100vh - 120px); color: var(--muted); gap: 12px; text-align: center; }
+.ae-card { background: #FFF8E1; border-radius: var(--radius-lg); margin-bottom: 16px; overflow: hidden; box-shadow: 0 1px 2px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.04); }
+.ae-card-hd { padding: 11px 16px; display: flex; align-items: center; gap: 8px; background: #FFFDF5; }
+.ae-card-title { font-size: 12px; font-weight: 700; color: var(--text); letter-spacing: -0.01em; text-transform: uppercase; }
+.ae-card-sub { font-size: 11px; color: var(--muted); margin-left: auto; }
+.ae-card-body { padding: 16px; }
+.ae-label { font-size: 10px; font-weight: 700; letter-spacing: 0.08em; color: var(--muted); text-transform: uppercase; margin-bottom: 5px; }
+.ae-question { font-size: 16px; font-weight: 600; color: var(--text); line-height: 1.4; margin-bottom: 14px; }
+.ae-answer { font-size: 13px; color: var(--text2); line-height: 1.75; padding: 12px 14px; background: #FFFDF5; border-radius: var(--radius); box-shadow: inset 0 1px 2px rgba(0,0,0,0.04); }
+.ae-math-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.ae-math-item { padding: 10px 12px; background: #FFFDF5; border-radius: var(--radius); box-shadow: inset 0 1px 2px rgba(0,0,0,0.04); }
+.ae-math-lbl { font-size: 10px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; }
+.ae-math-num { font-size: 24px; font-weight: 700; line-height: 1.1; }
+.ae-math-bar { height: 4px; background: var(--border); border-radius: 2px; margin-top: 7px; }
+.ae-math-fill { height: 100%; border-radius: 2px; transition: width .3s; }
+.ae-overall { display: flex; align-items: center; gap: 16px; padding: 14px 16px; background: #FFFDF5; border-radius: var(--radius); box-shadow: inset 0 1px 2px rgba(0,0,0,0.04); margin-bottom: 14px; }
+.ae-overall-score { font-size: 36px; font-weight: 800; line-height: 1; }
+.ae-overall-label { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+/* ── Math Score Dashboard ─────────────────────────────────────── */
+/* Math Score Tab */
+.ms-scroll { flex: 1; overflow-y: auto; padding: 16px 16px 24px; display: flex; flex-direction: column; gap: 12px; }
+.ms-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; align-items: stretch; }
+.ms-grid-1-2 { display: grid; grid-template-columns: 1fr 2fr; gap: 12px; align-items: stretch; }
+.ms-card { background: #FFFDF0; border-radius: 14px; box-shadow: 0 2px 4px rgba(0,0,0,0.08), 0 8px 16px rgba(0,0,0,0.06); padding: 14px; display: flex; flex-direction: column; }
+.ms-card-hd { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+.ms-card-icon { color: #854F0B; display: flex; flex-shrink: 0; }
+.ms-card-title { font-size: 13px; font-weight: 600; color: #2C2C2A; flex: 1; }
+.ms-card-sub { font-size: 10px; color: #888780; white-space: nowrap; }
+.ms-takeaway { font-size: 12px; color: #2C2C2A; line-height: 1.55; margin-bottom: 10px; }
+.ms-nested { background: #FFF8E1; border-radius: 10px; padding: 8px 10px; }
+.ms-score-big { font-size: 32px; font-weight: 500; line-height: 1; }
+.ms-expand { max-height: 0; overflow: hidden; transition: max-height 0.4s ease; }
+.ms-expand.open { max-height: 1200px; }
+.ms-expand-inner { padding: 10px; background: #FFF8E1; margin-top: 6px; border-radius: 10px; font-size: 11px; color: var(--text2); line-height: 1.7; }
+.ms-card-chevron { color: var(--muted); display: flex; transition: transform 0.2s; flex-shrink: 0; }
+.ms-card-chevron.open { transform: rotate(180deg); }
+.ms-see-more { display:flex; align-items:center; gap:4px; font-size:12px; color:#185FA5; cursor:pointer; font-weight:500; user-select:none; margin-top:auto; padding:8px 0 0; border-top:1px solid rgba(0,0,0,0.07); border-left:none; border-right:none; border-bottom:none; width:100%; background:transparent; box-shadow:none; appearance:none; -webkit-appearance:none; text-align:left; }
+.ms-see-more:hover { opacity:0.75; }
+.ms-see-more:focus { outline:1px solid #FFE082; outline-offset:2px; }
+.ms-card-chevron { transition: transform 0.2s; }
+.ms-see-more .ms-card-chevron.open { transform: rotate(180deg); }
+</style>
+</head>
+<body>
+
+<header>
+  <a class="logo">
+    EyeOnAI
+  </a>
+  <nav>
+    <button class="active" onclick="switchTab('chat')" id="tab-chat">Chat</button>
+    <button onclick="switchTab('math-score')" id="tab-math-score">Math Score</button>
+    <button onclick="switchTab('agent-eval')" id="tab-agent-eval">Agent Evaluation</button>
+    <button onclick="switchTab('disagreement')" id="tab-disagreement">Comparison</button>
+    <button onclick="switchTab('dashboard')" id="tab-dashboard">Dashboard</button>
+  </nav>
+</header>
+
+<!-- CHAT TAB -->
+<div id="chat-tab" class="tab-content active">
+  <div class="chat-panel">
+    <div class="chat-messages" id="chat-messages">
+      <div class="chat-empty" id="chat-empty">
+        <svg width="140" height="140" viewBox="0 0 36 36" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="EyeOnAI logo" style="flex-shrink:0;margin-bottom:32px">
+          <path d="M 5 21 Q 18 8 31 21" fill="none" stroke="#2C2C2A" stroke-width="2.2" stroke-linecap="round"/>
+          <path d="M 5 15 Q 18 28 31 15" fill="none" stroke="#2C2C2A" stroke-width="2.2" stroke-linecap="round"/>
+          <circle cx="18" cy="18" r="3.5" fill="#DC2626"/>
+        </svg>
+        <div style="font-size:64px;font-weight:600;color:#2C2C2A;text-align:center;letter-spacing:-1px;line-height:1">EyeOnAI</div>
+        <div style="font-size:18px;color:#6B6860;text-align:center;margin:20px auto 0;max-width:520px;line-height:1.6;padding:0 16px">Every AI answer, traced and double-checked by two independent scorers - so you know what to trust.</div>
+        <div style="margin-top:40px;width:100%;max-width:680px;background:#FFFDF0;box-shadow:0 2px 8px rgba(0,0,0,0.08),0 12px 24px rgba(0,0,0,0.07);border-radius:16px;padding:16px 20px;display:flex;gap:12px;align-items:center">
+          <input id="empty-question-input" type="text" placeholder="Ask anything..." autocomplete="off"
+                 style="flex:1;background:transparent;border:none;outline:none;font-size:16px;color:#2C2C2A;font-family:inherit"
+                 onkeydown="if(event.key==='Enter')sendFromEmpty()">
+          <button onclick="sendFromEmpty()" style="background:#185FA5;color:#E6F1FB;font-size:14px;font-weight:600;padding:12px 28px;border-radius:12px;border:none;cursor:pointer;font-family:inherit;flex-shrink:0">Send</button>
+        </div>
+      </div>
+    </div>
+    <div class="chat-input-wrap" id="chat-input-wrap" style="display:none">
+      <input type="text" id="question-input" placeholder="Ask anything…" autocomplete="off"
+             onkeydown="if(event.key==='Enter')sendQuestion()">
+      <button id="send-btn" onclick="sendQuestion()">Send</button>
+    </div>
+  </div>
+
+</div>
+
+<!-- MATH SCORE TAB -->
+<div id="math-score-tab" class="tab-content">
+  <div class="ae-trace-bar" id="ms-trace-bar" style="display:none;background:#FFFDF0">
+    <span style="font-weight:600;color:var(--text)">Viewing:</span>
+    <select id="ms-trace-select" onchange="showMathScore(this.value)"></select>
+    <button class="download-btn" onclick="downloadReport(document.getElementById('ms-trace-select').value)" style="margin-left:auto">Download Full Report</button>
+  </div>
+  <div style="flex:1;display:flex;flex-direction:column;overflow:hidden;background:#FFE082" id="ms-area">
+    <div class="ae-empty" id="ms-empty">
+      <div class="chat-empty-icon">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+      </div>
+      <h3 style="font-size:15px;font-weight:600;color:var(--text)">No report yet</h3>
+      <p style="font-size:12px;max-width:280px;color:var(--muted);line-height:1.6">Ask a question in Chat — the full Math Score report will appear here automatically, or click any Math Score card in the conversation.</p>
+    </div>
+    <div id="ms-content" style="display:none;flex:1;flex-direction:column;overflow:hidden"></div>
+  </div>
+</div>
+
+<!-- AGENT EVALUATION TAB -->
+<div id="agent-eval-tab" class="tab-content">
+  <div class="ae-trace-bar" id="ae-trace-bar" style="display:none">
+    <span style="font-weight:600;color:var(--text)">Viewing:</span>
+    <select id="ae-trace-select" onchange="showAgentEval(this.value)"></select>
+    <button class="download-btn" onclick="downloadReport(document.getElementById('ae-trace-select').value)" style="margin-left:auto">Download Full Report</button>
+  </div>
+  <div class="ae-scroll" id="ae-scroll">
+    <div class="ae-empty" id="ae-empty">
+      <div class="chat-empty-icon">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      </div>
+      <h3 style="font-size:15px;font-weight:600;color:var(--text)">No evaluation yet</h3>
+      <p style="font-size:12px;max-width:280px;color:var(--muted);line-height:1.6">Ask a question in Chat — the full agent and mathematical evaluation will appear here automatically.</p>
+    </div>
+    <div class="ae-inner" id="ae-content" style="display:none"></div>
+  </div>
+</div>
+
+<!-- DISAGREEMENT TAB -->
+<div id="disagreement-tab" class="tab-content">
+  <div class="ae-trace-bar" id="dg-trace-bar" style="display:none">
+    <span style="font-weight:600;color:var(--text)">Viewing:</span>
+    <select id="dg-trace-select" onchange="showDisagreement(this.value)"></select>
+    <button class="download-btn" onclick="downloadReport(document.getElementById('dg-trace-select').value)" style="margin-left:auto">Download Full Report</button>
+  </div>
+  <div class="ae-scroll" id="dg-scroll">
+    <div class="ae-empty" id="dg-empty">
+      <div class="chat-empty-icon">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3M3 16v3a2 2 0 0 0 2 2h3m10 0h3a2 2 0 0 0 2-2v-3"/></svg>
+      </div>
+      <h3 style="font-size:15px;font-weight:600;color:var(--text)">No trace yet</h3>
+      <p style="font-size:12px;max-width:280px;color:var(--muted);line-height:1.6">Ask a question in Chat — the layer-by-layer comparison will appear here.</p>
+    </div>
+    <div class="dg-inner" id="dg-content" style="display:none"></div>
+  </div>
+</div>
+
+<!-- DASHBOARD TAB -->
+<div id="dashboard-tab" class="tab-content">
+  <div class="dash-inner" id="dash-inner">
+    <div style="color:var(--muted);text-align:center;padding:60px">Loading dashboard…</div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+let sessionId = 'sess_' + Math.random().toString(36).slice(2, 10);
+let messages  = [];
+let allTraces = {};
+let activeTraceId = null;
+let dashboardLoaded = false;
+
+function switchTab(name) {
+  document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('nav button').forEach(el => el.classList.remove('active'));
+  document.getElementById(name + '-tab').classList.add('active');
+  document.getElementById('tab-' + name).classList.add('active');
+  if (name === 'dashboard' && !dashboardLoaded) loadDashboard();
+}
+
+function useChip(el) {
+  document.getElementById('question-input').value = el.textContent;
+  sendQuestion();
+}
+
+function sendFromEmpty() {
+  const emptyInput = document.getElementById('empty-question-input');
+  if (!emptyInput) return;
+  document.getElementById('question-input').value = emptyInput.value;
+  sendQuestion();
+}
+
+async function sendQuestion() {
+  const input = document.getElementById('question-input');
+  const question = input.value.trim();
+  if (!question) return;
+  input.value = '';
+  document.getElementById('send-btn').disabled = true;
+  const empty = document.getElementById('chat-empty');
+  if (empty) {
+    empty.remove();
+    document.getElementById('chat-input-wrap').style.display = 'flex';
+  }
+  appendUserBubble(question);
+  const thinkId = appendThinking();
+  try {
+    const res = await fetch('/api/ask', {
+      method: 'POST', headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({question, session_id: sessionId}),
+    });
+    const trace = await res.json();
+    allTraces[trace.trace_id] = trace;
+    removeThinking(thinkId);
+    appendAnswerBubble(trace);
+    updateMathScoreTab(trace);
+    updateAgentEvalTab(trace);
+    updateDisagreementTab(trace);
+    messages.push({question, trace});
+  } catch(e) {
+    removeThinking(thinkId);
+    showToast('Error: could not reach EyeOnAI backend');
+  }
+  document.getElementById('send-btn').disabled = false;
+}
+
+function appendUserBubble(question) {
+  const msgs = document.getElementById('chat-messages');
+  const div = document.createElement('div');
+  div.className = 'msg';
+  div.innerHTML = `<div class="msg-q">${esc(question)}</div>`;
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function appendThinking() {
+  const msgs = document.getElementById('chat-messages');
+  const id = 'think_' + Date.now();
+  const div = document.createElement('div');
+  div.id = id; div.className = 'thinking';
+  div.innerHTML = `<div class="dot"></div><div class="dot"></div><div class="dot"></div><span>Running 8-step pipeline + deep verification…</span>`;
+  msgs.appendChild(div); msgs.scrollTop = msgs.scrollHeight;
+  return id;
+}
+
+function removeThinking(id) { const el = document.getElementById(id); if (el) el.remove(); }
+
+function _inlineScorecards(trace) {
+  const ev        = trace.evaluator_scores    || {};
+  const ca        = trace.confidence_assessment || {};
+  const tid       = trace.trace_id;
+
+  // Use the same authoritative combined score that _passFail and renderReport use
+  const overallScore = Math.round((trace.quality_scores?.overall || 0) * 100);
+  const evalScore    = ev.evaluator_score || 0;
+  const caLevel      = ca.level || 'HIGH';
+
+  const dotClass   = n => n >= 80 ? 'isc-dot-green' : n >= 60 ? 'isc-dot-amber' : 'isc-dot-red';
+  const caDotClass = caLevel === 'HIGH' ? 'isc-dot-green' : 'isc-dot-amber';
+
+  return `
+    <div class="isc-row">
+      <span class="isc-pill" onclick="goToMathScore('${tid}')">
+        <span class="isc-dot ${dotClass(overallScore)}"></span>Math score
+      </span>
+      <span class="isc-pill" onclick="goToAgentEval('${tid}')">
+        <span class="isc-dot ${dotClass(evalScore)}"></span>AI review
+      </span>
+      <span class="isc-pill" onclick="goToDisagreement('${tid}')">
+        <span class="isc-dot ${caDotClass}"></span>Comparison
+      </span>
+      ${_passFail(trace)}
+    </div>`;
+}
+
+function _passFail(trace) {
+  const overall   = trace.quality_scores?.overall || 0;
+  const score100  = Math.round(overall * 100);
+  if (score100 >= 80) {
+    return `<span style="display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:500;color:#0F766E;background:#E0F2F1;padding:6px 14px;border-radius:999px;box-shadow:0 1px 2px rgba(0,0,0,0.04)">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Pass
+    </span>`;
+  }
+  if (score100 >= 60) {
+    return `<span style="display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:500;color:#92400E;background:#FEF3C7;padding:6px 14px;border-radius:999px;box-shadow:0 1px 2px rgba(0,0,0,0.04)">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>Review
+    </span>`;
+  }
+  return `<span style="display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:500;color:#B91C1C;background:#FFE0E0;padding:6px 14px;border-radius:999px;box-shadow:0 1px 2px rgba(0,0,0,0.04)">
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>Fail
+  </span>`;
+}
+
+function appendAnswerBubble(trace) {
+  const msgs = document.getElementById('chat-messages');
+  const div = document.createElement('div');
+  div.className = 'msg';
+  div.setAttribute('data-trace-id', trace.trace_id);
+  div.innerHTML = `
+    <div class="msg-a-wrap">
+      <div class="msg-a" onclick="openReport('${trace.trace_id}')" id="bubble_${trace.trace_id}">
+        ${esc(trace.answer)}
+      </div>
+      ${_inlineScorecards(trace)}
+      <div class="msg-meta">
+        <div class="msg-actions" style="margin-left:auto;display:flex;gap:6px;align-items:center">
+          <button class="feedback-btn ${trace.feedback==='up'?'up-active':''}"
+            id="up_${trace.trace_id}" onclick="submitFeedback('${trace.trace_id}','up',event)" title="Helpful">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3H14z"/><path d="M7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg>
+          </button>
+          <button class="feedback-btn ${trace.feedback==='down'?'down-active':''}"
+            id="down_${trace.trace_id}" onclick="submitFeedback('${trace.trace_id}','down',event)" title="Not helpful">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3H10z"/><path d="M17 2h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17"/></svg>
+          </button>
+          <a class="trace-link" onclick="goToMathScore('${trace.trace_id}')">View report</a>
+        </div>
+      </div>
+    </div>`;
+  msgs.appendChild(div); msgs.scrollTop = msgs.scrollHeight;
+}
+
+function trustBadge(score) {
+  const cls = score>=.85?'trust-green':score>=.70?'trust-yellow':'trust-red';
+  const label = score>=.85?'Trusted':score>=.70?'Review':'Flagged';
+  return `<span class="trust-badge ${cls}">${label} ${(score*100).toFixed(0)}%</span>`;
+}
+
+function verdictBadge(verdict) {
+  if (!verdict) return '';
+  return `<span class="verdict-badge verdict-${verdict}">${verdict}</span>`;
+}
+
+function iqBadges(layers) {
+  return `<div class="iq-badges">
+    ${['foundry','fabric'].map(k=>
+      `<span class="iq-badge ${layers[k]?'iq-active':'iq-inactive'}">${{foundry:'Foundry IQ',fabric:'Fabric IQ'}[k]}</span>`
+    ).join('')}</div>`;
+}
+
+async function submitFeedback(traceId, sentiment, event) {
+  event.stopPropagation();
+  await fetch('/api/feedback', {method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({trace_id: traceId, sentiment})});
+  document.getElementById('up_'+traceId).classList.toggle('up-active', sentiment==='up');
+  document.getElementById('down_'+traceId).classList.toggle('down-active', sentiment==='down');
+  showToast(sentiment==='up'?'Marked as helpful':'Flagged for review');
+  if (allTraces[traceId]) allTraces[traceId].feedback = sentiment;
+}
+
+function goToMathScore(traceId) { openReport(traceId); }
+
+function goToAgentEval(traceId) {
+  switchTab('agent-eval');
+  const sel = document.getElementById('ae-trace-select');
+  if (sel) { sel.value = traceId; showAgentEval(traceId); }
+}
+
+function goToDisagreement(traceId) {
+  switchTab('disagreement');
+  const sel = document.getElementById('dg-trace-select');
+  if (sel) { sel.value = traceId; showDisagreement(traceId); }
+}
+
+// ─── Math Score tab ───────────────────────────────────────────────────────────
+function updateMathScoreTab(trace) {
+  const sel = document.getElementById('ms-trace-select');
+  const opt = document.createElement('option');
+  opt.value = trace.trace_id;
+  const q = trace.question.length > 60 ? trace.question.slice(0, 60) + '…' : trace.question;
+  opt.textContent = q;
+  sel.insertBefore(opt, sel.firstChild);
+  sel.value = trace.trace_id;
+  document.getElementById('ms-trace-bar').style.display = 'flex';
+  showMathScore(trace.trace_id);
+}
+
+function showMathScore(traceId) {
+  const trace = allTraces[traceId];
+  if (!trace) return;
+  document.getElementById('ms-empty').style.display = 'none';
+  const rc = document.getElementById('ms-content');
+  rc.style.display = 'flex';
+  rc.style.flexDirection = 'column';
+  rc.style.overflow = 'hidden';
+  renderReport(trace);
+}
+
+// ─── Report Viewer ────────────────────────────────────────────────────────────
+async function openReport(traceId) {
+  document.querySelectorAll('.msg-a').forEach(el => el.classList.remove('active'));
+  const bubble = document.getElementById('bubble_' + traceId);
+  if (bubble) bubble.classList.add('active');
+  activeTraceId = traceId;
+  let trace = allTraces[traceId];
+  if (!trace || !trace.spans) {
+    const res = await fetch('/api/traces/' + traceId);
+    trace = await res.json();
+    allTraces[traceId] = trace;
+  }
+  switchTab('math-score');
+  const sel = document.getElementById('ms-trace-select');
+  if (sel) sel.value = traceId;
+  showMathScore(traceId);
+}
+
+const CHEVRON = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>`;
+
+// ── Chart instance registry (destroy before re-render) ────────────────────────
+const _msCharts = {};
+function _msDestroyCharts() {
+  Object.keys(_msCharts).forEach(k => { try { _msCharts[k].destroy(); } catch(e) {} delete _msCharts[k]; });
+}
+const _dgCharts = {};
+function _dgDestroyCharts() {
+  Object.keys(_dgCharts).forEach(k => { try { _dgCharts[k].destroy(); } catch(e) {} delete _dgCharts[k]; });
+}
+let _dgChartSpecs = [];
+const _aeCharts = {};
+function _aeDestroyCharts() {
+  Object.keys(_aeCharts).forEach(k => { try { _aeCharts[k].destroy(); } catch(e) {} delete _aeCharts[k]; });
+}
+let _aeChartSpec = null;
+
+// ── Generic expand/collapse toggle ────────────────────────────────────────────
+const _SM_DOWN = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>`;
+const _SM_UP   = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>`;
+function msSeeMore(expId, btnId) {
+  const panel = document.getElementById(expId);
+  const btn   = document.getElementById(btnId);
+  if (!panel) return;
+  const open = panel.classList.toggle('open');
+  if (btn) btn.innerHTML = open ? _SM_UP + ' See less' : _SM_DOWN + ' See more';
+}
+
+function msToggle(panelId, hdElOrId) {
+  const panel = document.getElementById(panelId);
+  if (!panel) return;
+  const hd = typeof hdElOrId === 'string' ? document.getElementById(hdElOrId) : hdElOrId;
+  const chevron = hd ? hd.querySelector('.ms-card-chevron') : null;
+  const open = panel.classList.toggle('open');
+  if (chevron) chevron.classList.toggle('open', open);
+}
+
+function renderReport(trace) {
+  _msDestroyCharts();
+  const rc = document.getElementById('ms-content');
+  const rules    = trace.rules_scores || {};
+  const ev       = trace.evaluator_scores || {};
+  const overall  = trace.quality_scores?.overall || 0;
+  // Derive verdict from actual score, not the evaluator's strict binary judgment.
+  // The evaluator LLM can say FAIL even at 70+ because it's calibrated to be harsh.
+  // We show PASS ≥80, REVIEW 60-79, FAIL <60 — and expose ev.verdict in "See more".
+  const verdict  = overall >= 0.80 ? 'PASS' : overall >= 0.60 ? 'REVIEW' : (ev.verdict || 'FAIL');
+  const disagree = trace.scoring_disagreements || [];
+  const chunks   = _getChunks(trace);
+  const fabric   = trace.fabric_insights || {};
+  const sa       = trace.sentence_analysis || [];
+  const tid      = trace.trace_id;
+  const score100 = Math.round(overall * 100);
+  const scoreColor = overall >= .80 ? '#639922' : overall >= .60 ? '#EF9F27' : '#E24B4A';
+
+  // Sentence verdict counts
+  const counts = {SUPPORTED:0, UNVERIFIED:0, CONTRADICTION:0, PARTIAL:0};
+  sa.forEach(s => { if (counts[s.verdict] !== undefined) counts[s.verdict]++; });
+  const total = sa.length;
+
+  // ── CARD 1: Trust Score ────────────────────────────────────────────────────
+  const vBg = {PASS:'#F0FDF4',FAIL:'#FEF2F2',REVIEW:'#FFFBEB'};
+  const vFg = {PASS:'#16A34A',FAIL:'#DC2626',REVIEW:'#D97706'};
+  const confLevel = trace.quality_scores?.confidence_level || 'UNKNOWN';
+  let trustTakeaway;
+  if (score100 >= 80 && confLevel === 'HIGH') {
+    trustTakeaway = 'Both scoring layers agree this is a reliable, well-grounded answer.';
+  } else if (score100 >= 80) {
+    trustTakeaway = 'The score is high, but the two scoring layers disagree on why — see Comparison for details.';
+  } else if (score100 >= 60) {
+    const noHallucVal = Math.max(0, 1 - (rules.hallucination_risk || 0));
+    const weakCount = [rules.groundedness||0, noHallucVal, rules.cost_efficiency||0, rules.citation_integrity||0, rules.response_completeness||0].filter(v => v < 0.7).length;
+    trustTakeaway = `This answer passes, but ${weakCount} area${weakCount !== 1 ? 's' : ''} need${weakCount === 1 ? 's' : ''} attention — see Scoring breakdown.`;
+  } else {
+    trustTakeaway = 'This answer has significant issues — human review recommended.';
+  }
+  const c1EvRows = [
+    ['Groundedness',    ev.groundedness_score,       rules.groundedness],
+    ['Hallucination',   ev.hallucination_score,      1-(rules.hallucination_risk||0)],
+    ['Relevance',       ev.relevance_score,          null],
+    ['Safety',          ev.safety_score,             null],
+    ['Clarity',         ev.clarity_score,            null],
+    ['Citation integ.', ev.citation_integrity_score, rules.citation_integrity],
+    ['Completeness',    ev.completeness_score,       rules.response_completeness],
+  ].filter(([,ev]) => ev != null);
+  const c1EvHtml = c1EvRows.map(([name, evVal, rVal]) => {
+    const ec = evVal >= .7 ? '#639922' : evVal >= .4 ? '#EF9F27' : '#E24B4A';
+    const rHtml = rVal != null ? `<span style="font-size:10px;color:#888780;margin-left:4px">(rules: ${(rVal*100).toFixed(0)}%)</span>` : '';
+    return `<div style="display:flex;justify-content:space-between;align-items:center;padding:3px 0;border-bottom:1px solid rgba(0,0,0,0.04)">
+      <span style="font-size:11px;color:#2C2C2A">${name}</span>
+      <span style="font-size:11px;font-weight:600;color:${ec}">${(evVal*100).toFixed(0)}%${rHtml}</span>
+    </div>`;
+  }).join('');
+  const card1 = `
+    <div class="ms-card">
+      <div class="ms-card-hd">
+        <span class="ms-card-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span>
+        <span class="ms-card-title">Trust score</span>
+        <span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;background:${vBg[verdict]||'#FFFBEB'};color:${vFg[verdict]||'#D97706'}">${verdict}</span>
+      </div>
+      <div style="display:flex;align-items:baseline;gap:4px;margin-bottom:8px">
+        <span class="ms-score-big" style="color:${scoreColor}">${score100}</span>
+        <span style="font-size:14px;color:#888780">/100</span>
+      </div>
+      <p class="ms-takeaway">${trustTakeaway}</p>
+      <div style="font-size:11px;color:#888780;line-height:1.7">${trace.total_duration_ms}ms · $${(trace.cost_estimate||0).toFixed(4)} · Foundry IQ · Fabric IQ</div>
+      <div class="ms-see-more" id="ms-sm-btn-1-${tid}" onclick="msSeeMore('ms-sm-exp-1-${tid}','ms-sm-btn-1-${tid}')">${_SM_DOWN} See more</div>
+      <div class="ms-expand" id="ms-sm-exp-1-${tid}">
+        <div class="ms-expand-inner">
+          <div style="font-size:11px;font-weight:600;color:#2C2C2A;margin-bottom:6px">Score weights</div>
+          <div style="font-size:10px;color:#888780;line-height:1.8;margin-bottom:10px">Groundedness 20% · Hallucination 20% · Relevance 15% · Safety 15% · Clarity 10% · Cost 10% · Citation 5% · Completeness 5%</div>
+          ${c1EvHtml ? `<div style="font-size:11px;font-weight:600;color:#2C2C2A;margin-bottom:4px;margin-top:6px">Evaluator scores</div>${c1EvHtml}` : ''}
+          ${ev.verdict ? `<div style="margin-top:8px;font-size:10px;color:#888780">Evaluator's raw verdict: <strong style="color:${vFg[ev.verdict]||'#D97706'}">${ev.verdict}</strong> (displayed badge is score-derived: ≥80 = PASS, 60–79 = REVIEW, &lt;60 = FAIL)</div>` : ''}
+          ${ev.summary ? `<div style="margin-top:8px;font-size:11px;color:var(--text2);line-height:1.65;font-style:italic">"${esc(ev.summary)}"</div>` : ''}
+          <div style="margin-top:10px;font-size:10px;color:#888780">${new Date(trace.timestamp).toLocaleString()} · <span style="font-family:monospace">${tid}</span></div>
+        </div>
+      </div>
+    </div>`;
+
+  // ── CARD 2: Scoring Breakdown ──────────────────────────────────────────────
+  const noHalluc = Math.max(0, 1 - (rules.hallucination_risk || 0));
+  const metricEntries = [
+    ['Grounded',   rules.groundedness || 0],
+    ['No halluc.', noHalluc],
+    ['Cost OK',    rules.cost_efficiency || 0],
+    ['Citations',  rules.citation_integrity || 0],
+    ['Complete',   rules.response_completeness || 0],
+  ];
+  let breakdownTakeaway;
+  if (metricEntries.every(([,v]) => v >= 0.8)) {
+    breakdownTakeaway = 'All five scoring dimensions are strong.';
+  } else {
+    const weakest = metricEntries.reduce((a, b) => b[1] < a[1] ? b : a);
+    const hallucRisk = rules.hallucination_risk || 0;
+    const hallucLevel = hallucRisk < 0.3 ? 'low' : hallucRisk < 0.5 ? 'moderate' : 'high';
+    const unvCount = sa.filter(s => s.verdict === 'UNVERIFIED' || s.verdict === 'CONTRADICTION').length;
+    let weakClause;
+    if (weakest[0] === 'Grounded' && unvCount > 0) {
+      weakClause = `only groundedness is slightly weak, since ${unvCount} sentence${unvCount !== 1 ? 's' : ''} lack${unvCount === 1 ? 's' : ''} direct evidence`;
+    } else if (weakest[0] === 'No halluc.') {
+      weakClause = 'hallucination risk is elevated';
+    } else if (weakest[0] === 'Citations') {
+      weakClause = 'citation integrity is the weakest dimension';
+    } else if (weakest[0] === 'Complete') {
+      weakClause = 'response completeness is the weakest dimension';
+    } else {
+      weakClause = `${weakest[0].toLowerCase()} is the weakest dimension`;
+    }
+    breakdownTakeaway = `Hallucination risk is ${hallucLevel} — ${weakClause}.`;
+  }
+  const disagreeBtn = disagree.length ? `
+    <div style="margin-top:8px;cursor:pointer;padding:4px 8px;border-radius:6px;background:#FFFBEB;display:inline-flex;align-items:center;gap:5px" onclick="goToDisagreement('${tid}')">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#D97706" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      <span style="font-size:10px;color:#D97706;font-weight:600">${disagree.length} layer disagreement${disagree.length > 1 ? 's' : ''}</span>
+    </div>` : '';
+  const c2MetricDesc = {
+    'Grounded':   'Fraction of answer sentences with NLI entailment ≥ 0.7 against retrieved chunks. Computed via cross-encoder/nli-deberta-v3-small.',
+    'No halluc.': 'Inverted hallucination risk (1 − risk). Risk combines 40% NLI entailment + 30% numeric/figure verification + 30% self-consistency across resampled responses.',
+    'Cost OK':    'Token usage vs expected baseline for this question type. Overage penalises the score linearly.',
+    'Citations':  'Checks whether citation phrases ("according to X", "studies show") match an actual retrieved source. 1.0 if no citation phrases used.',
+    'Complete':   'Word count and structure relative to expected length for this question complexity.',
+  };
+  const c2DetailHtml = metricEntries.map(([name, val]) => {
+    const c = val >= .7 ? '#639922' : val >= .4 ? '#EF9F27' : '#E24B4A';
+    return `<div style="margin-bottom:8px">
+      <div style="display:flex;justify-content:space-between;margin-bottom:2px">
+        <span style="font-size:11px;font-weight:600;color:#2C2C2A">${name}</span>
+        <span style="font-size:11px;font-weight:700;color:${c}">${(val*100).toFixed(0)}%</span>
+      </div>
+      <div style="font-size:10px;color:#888780;line-height:1.55">${c2MetricDesc[name]||''}</div>
+    </div>`;
+  }).join('');
+  const card2 = `
+    <div class="ms-card">
+      <div class="ms-card-hd">
+        <span class="ms-card-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></span>
+        <span class="ms-card-title">Scoring breakdown</span>
+      </div>
+      <p class="ms-takeaway">${breakdownTakeaway}</p>
+      <div style="position:relative;height:80px;flex-shrink:0" role="img" aria-label="Scoring breakdown chart">
+        <canvas id="ms-bar-${tid}"></canvas>
+      </div>
+      ${disagreeBtn}
+      <div class="ms-see-more" id="ms-sm-btn-2-${tid}" onclick="msSeeMore('ms-sm-exp-2-${tid}','ms-sm-btn-2-${tid}')">${_SM_DOWN} See more</div>
+      <div class="ms-expand" id="ms-sm-exp-2-${tid}">
+        <div class="ms-expand-inner">
+          <div style="font-size:11px;font-weight:600;color:#2C2C2A;margin-bottom:8px">How each metric is calculated</div>
+          ${c2DetailHtml}
+          ${disagree.length ? `<div style="margin-top:8px;font-size:11px;font-weight:600;color:#D97706">⚠ ${disagree.length} layer disagreement${disagree.length>1?'s':''}</div>
+          <div style="font-size:10px;color:#888780;margin-top:2px;line-height:1.6">The rules engine and evaluator agent scored one or more dimensions differently by >25 points. Open the Comparison tab for a full root-cause breakdown.</div>` : ''}
+        </div>
+      </div>
+    </div>`;
+
+  // ── CARD 3: Sentence Check ─────────────────────────────────────────────────
+  let sentTakeaway;
+  if (total === 0) {
+    sentTakeaway = 'No sentences were analyzed for this response.';
+  } else {
+    const sup = counts.SUPPORTED;
+    const unv = counts.UNVERIFIED + counts.PARTIAL;
+    const con = counts.CONTRADICTION;
+    let parts = [`${sup} of ${total} claim${total !== 1 ? 's' : ''} ${sup === 1 ? 'is' : 'are'} <strong style="font-weight:500;color:#639922">directly backed</strong> by sources.`];
+    if (unv > 0) parts.push(`${unv} claim${unv !== 1 ? 's' : ''} couldn't be verified`);
+    if (con > 0) parts.push(`${con} contradict${con === 1 ? 's' : ''} the evidence`);
+    sentTakeaway = parts[0] + (parts.length > 1 ? ' ' + parts.slice(1).join(', and ') + '.' : '');
+  }
+  const sentVColor = {SUPPORTED:'#639922',PARTIAL:'#EF9F27',UNVERIFIED:'#9CA3AF',CONTRADICTION:'#E24B4A'};
+  const sentVBg    = {SUPPORTED:'#F0FDF4',PARTIAL:'#FFFBEB',UNVERIFIED:'#F3F4F6',CONTRADICTION:'#FEF2F2'};
+  const allSentsHtml3 = sa.length ? sa.map(s => {
+    const v = s.verdict || 'UNVERIFIED';
+    const txt = s.sentence.length > 200 ? s.sentence.slice(0, 200) + '…' : s.sentence;
+    return `<div class="ms-nested" style="margin-bottom:6px">
+      <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px">
+        <span style="font-size:10px;font-weight:700;padding:1px 7px;border-radius:20px;background:${sentVBg[v]};color:${sentVColor[v]}">${v}</span>
+        <span style="font-size:10px;color:#888780;margin-left:auto">ent ${(s.entailment_score||0).toFixed(2)}</span>
+      </div>
+      <div style="font-size:11px;color:var(--text2);line-height:1.5">${esc(txt)}</div>
+    </div>`;
+  }).join('') : '<div style="font-size:11px;color:#888780">No sentences to show.</div>';
+  const card3 = `
+    <div class="ms-card">
+      <div class="ms-card-hd">
+        <span class="ms-card-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span>
+        <span class="ms-card-title">Sentence check</span>
+        <span class="ms-card-sub">${total} sentence${total !== 1 ? 's' : ''}</span>
+      </div>
+      <p class="ms-takeaway">${sentTakeaway}</p>
+      <div style="display:flex;gap:14px;align-items:center">
+        ${total >= 2 ? `<div style="position:relative;width:50px;height:50px;flex-shrink:0" role="img" aria-label="Sentence verdict donut"><canvas id="ms-donut-${tid}"></canvas></div>` : ''}
+        <div style="font-size:11px;color:#888780;line-height:1.55">Each sentence is checked against retrieved evidence using NLI. <strong style="color:#2C2C2A;font-weight:500">SUPPORTED</strong> ≥ 0.7 entailment. <strong style="color:#2C2C2A;font-weight:500">CONTRADICTION</strong> caps hallucination risk at 0.3.</div>
+      </div>
+      <div class="ms-see-more" id="ms-sm-btn-3-${tid}" onclick="msSeeMore('ms-sm-exp-3-${tid}','ms-sm-btn-3-${tid}')">${_SM_DOWN} See more</div>
+      <div class="ms-expand" id="ms-sm-exp-3-${tid}">
+        <div class="ms-expand-inner">
+          <div style="font-size:11px;font-weight:600;color:#2C2C2A;margin-bottom:8px">All sentences &amp; verdicts</div>
+          ${allSentsHtml3}
+        </div>
+      </div>
+    </div>`;
+
+  // ── CARD 4: Evidence Used ──────────────────────────────────────────────────
+  const numChunks = chunks.length;
+  let evidTakeaway;
+  if (numChunks === 0) {
+    evidTakeaway = 'No evidence was retrieved — this response has no grounding data.';
+  } else {
+    const highSim = chunks.filter(c => (c.similarity_score||0) >= 0.85).length;
+    const lowSim  = chunks.filter(c => (c.similarity_score||0) < 0.6).length;
+    let qual;
+    if (highSim === numChunks) {
+      qual = 'All are highly relevant.';
+    } else if (lowSim === 0) {
+      qual = `${highSim > 1 ? highSim + ' are' : 'One is'} highly relevant; ${numChunks - highSim === 1 ? 'one is' : (numChunks - highSim) + ' are'} a weaker match.`;
+    } else {
+      qual = 'Relevance is mixed.';
+    }
+    evidTakeaway = `Foundry IQ found ${numChunks} source${numChunks !== 1 ? 's' : ''}. ${qual}`;
+  }
+  const evidChunks  = chunks.slice(0, 5);
+  const evidLabels  = evidChunks.map(c => { const n = c.source || c.chunk_id || 'Source'; return n.length > 15 ? n.slice(0,14)+'…' : n; });
+  const evidVals    = evidChunks.map(c => c.similarity_score || 0);
+  const evidColors  = evidVals.map(v => v >= 0.85 ? '#639922' : v >= 0.6 ? '#EF9F27' : '#E24B4A');
+  const evidHeight  = Math.max(48, evidChunks.length * 22);
+  const usedChunkIds = new Set(sa.map(s => s.supporting_chunk).filter(Boolean));
+  const c4ChunkHtml = chunks.length ? chunks.map((c, i) => {
+    const sim = c.similarity_score || 0;
+    const simColor = sim >= .85 ? '#639922' : sim >= .6 ? '#EF9F27' : '#E24B4A';
+    const cited = usedChunkIds.has(c.chunk_id);
+    const preview = (c.content || '').slice(0, 180) + ((c.content||'').length > 180 ? '…' : '');
+    return `<div class="ms-nested" style="margin-bottom:6px">
+      <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
+        <span style="font-size:11px;font-weight:600;color:#185FA5;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(c.source || c.chunk_id)}</span>
+        <span style="font-size:11px;font-weight:700;color:${simColor};flex-shrink:0">${(sim*100).toFixed(0)}%</span>
+      </div>
+      <div style="font-size:10px;color:#888780;margin-bottom:4px;font-family:monospace">${esc(c.chunk_id)}</div>
+      ${cited ? '<div style="font-size:10px;color:#639922;font-weight:600;margin-bottom:4px">✓ cited in answer</div>' : ''}
+      ${preview ? `<div style="font-size:11px;color:var(--text2);line-height:1.5">${esc(preview)}</div>` : ''}
+    </div>`;
+  }).join('') : '<div style="font-size:11px;color:#888780">No chunks retrieved.</div>';
+  const card4 = `
+    <div class="ms-card">
+      <div class="ms-card-hd">
+        <span class="ms-card-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg></span>
+        <span class="ms-card-title">Evidence used</span>
+        <span class="ms-card-sub">Foundry IQ</span>
+      </div>
+      <p class="ms-takeaway">${evidTakeaway}</p>
+      ${numChunks > 0
+        ? `<div style="position:relative;height:${evidHeight}px;flex-shrink:0" role="img" aria-label="Evidence similarity chart"><canvas id="ms-evid-${tid}"></canvas></div>`
+        : '<div class="ms-nested" style="font-size:11px;color:#888780">No evidence retrieved.</div>'}
+      <div class="ms-see-more" id="ms-sm-btn-4-${tid}" onclick="msSeeMore('ms-sm-exp-4-${tid}','ms-sm-btn-4-${tid}')">${_SM_DOWN} See more</div>
+      <div class="ms-expand" id="ms-sm-exp-4-${tid}">
+        <div class="ms-expand-inner">
+          <div style="font-size:11px;font-weight:600;color:#2C2C2A;margin-bottom:8px">All retrieved chunks</div>
+          ${c4ChunkHtml}
+        </div>
+      </div>
+    </div>`;
+
+  // ── CARD 5: Response Time ──────────────────────────────────────────────────
+  const spans = trace.spans || [];
+  const SPAN_LABELS = {
+    CAPTURE:'Capture', INTENT_ROUTER:'Route question', RETRIEVER:'Find evidence',
+    CHUNKS:'Process evidence', LLM_CALL:'Generate answer', TOOL_CALLS:'Tool calls',
+    FINAL_RESPONSE:'Finalize', QUALITY_CHECK:'Quality check',
+  };
+  const totalMs  = trace.total_duration_ms || 0;
+  const totalSec = (totalMs / 1000).toFixed(1);
+  const sortedSpans = [...spans].sort((a, b) => b.duration_ms - a.duration_ms).slice(0, 3);
+  let timeTakeaway;
+  if (sortedSpans.length > 0) {
+    const mx = sortedSpans[0];
+    let phrase;
+    if (mx.name === 'QUALITY_CHECK')                              phrase = "most of that was EyeOnAI's own quality checking, not the AI's answer";
+    else if (mx.name === 'LLM_CALL')                             phrase = 'most of that was generating the answer itself';
+    else if (mx.name === 'RETRIEVER' || mx.name === 'CHUNKS')    phrase = 'most of that was retrieving evidence';
+    else                                                          phrase = `most of that was the ${(SPAN_LABELS[mx.name]||mx.name).toLowerCase()} step`;
+    timeTakeaway = `Took <strong style="font-weight:500">${totalSec}s</strong> total — ${phrase}.`;
+  } else {
+    timeTakeaway = `Total pipeline time: ${totalSec}s.`;
+  }
+  const timeLabels = sortedSpans.map(sp => SPAN_LABELS[sp.name] || sp.name.toLowerCase());
+  const timeVals   = sortedSpans.map(sp => sp.duration_ms);
+  const timeColors = sortedSpans.map((_, i) => i === 0 ? '#EF9F27' : '#639922');
+  const timeHeight = Math.max(48, sortedSpans.length * 24);
+  const SPAN_DESC5 = {
+    CAPTURE:'Records the incoming question and initialises the trace.',
+    INTENT_ROUTER:'Classifies the question into an intent category (e.g. career, finance, legal, health).',
+    RETRIEVER:'Queries Foundry IQ to find relevant knowledge chunks for this question type.',
+    CHUNKS:'Returns retrieved evidence chunks with similarity scores.',
+    LLM_CALL:'Generates the answer using retrieved chunks as context via the main language model.',
+    TOOL_CALLS:'Fabric IQ checks for any additional tool-based verifications.',
+    FINAL_RESPONSE:'Assembles the final answer for display.',
+    QUALITY_CHECK:'Runs the full scoring pipeline: rules engine + evaluator agent + disagreement analysis.',
+  };
+  const tu = trace.token_usage || {};
+  const allSpansSorted = [...spans].sort((a, b) => b.duration_ms - a.duration_ms);
+  const c5AllSpansHtml = spans.map(sp => {
+    const dotColor = sp.duration_ms >= 1000 ? '#EF9F27' : sp.duration_ms >= 300 ? '#EF9F27' : '#639922';
+    const pct = totalMs > 0 ? ((sp.duration_ms / totalMs) * 100).toFixed(0) : 0;
+    return `<div style="margin-bottom:6px">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:2px">
+        <span style="width:7px;height:7px;border-radius:50%;background:${dotColor};flex-shrink:0"></span>
+        <span style="font-size:11px;color:#2C2C2A;flex:1">${SPAN_LABELS[sp.name]||sp.name.toLowerCase()}</span>
+        <span style="font-size:11px;font-weight:600;color:#2C2C2A">${sp.duration_ms}ms</span>
+        <span style="font-size:10px;color:#888780">${pct}%</span>
+      </div>
+      ${SPAN_DESC5[sp.name] ? `<div style="font-size:10px;color:#888780;padding-left:15px;line-height:1.5">${SPAN_DESC5[sp.name]}</div>` : ''}
+    </div>`;
+  }).join('');
+  const card5 = `
+    <div class="ms-card">
+      <div class="ms-card-hd">
+        <span class="ms-card-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></span>
+        <span class="ms-card-title">Response time</span>
+        <span class="ms-card-sub">${totalSec}s total</span>
+      </div>
+      <p class="ms-takeaway">${timeTakeaway}</p>
+      ${sortedSpans.length > 0
+        ? `<div style="position:relative;height:${timeHeight}px;flex-shrink:0" role="img" aria-label="Response time breakdown chart"><canvas id="ms-time-${tid}"></canvas></div>`
+        : '<div class="ms-nested" style="font-size:11px;color:#888780">No span data available.</div>'}
+      <div class="ms-see-more" id="ms-sm-btn-5-${tid}" onclick="msSeeMore('ms-sm-exp-5-${tid}','ms-sm-btn-5-${tid}')">${_SM_DOWN} See more</div>
+      <div class="ms-expand" id="ms-sm-exp-5-${tid}">
+        <div class="ms-expand-inner">
+          <div style="font-size:11px;font-weight:600;color:#2C2C2A;margin-bottom:8px">Full pipeline breakdown</div>
+          ${c5AllSpansHtml || '<div style="font-size:11px;color:#888780">No span data.</div>'}
+          <div style="margin-top:10px;padding-top:8px;border-top:1px solid rgba(0,0,0,0.06);display:flex;gap:16px;flex-wrap:wrap">
+            <span style="font-size:11px;color:#888780">Tokens: <strong style="color:#2C2C2A">${tu.total_tokens||0}</strong></span>
+            <span style="font-size:11px;color:#888780">Prompt: <strong style="color:#2C2C2A">${tu.prompt_tokens||0}</strong></span>
+            <span style="font-size:11px;color:#888780">Completion: <strong style="color:#2C2C2A">${tu.completion_tokens||0}</strong></span>
+            <span style="font-size:11px;color:#888780">Cost: <strong style="color:#2C2C2A">$${(trace.cost_estimate||0).toFixed(4)}</strong></span>
+          </div>
+        </div>
+      </div>
+    </div>`;
+
+  // ── CARD 6: Topic Trends ───────────────────────────────────────────────────
+  const trends       = fabric.trends || {};
+  const intentRates  = trends.intent_flag_rates || {};
+  const fabricTraceCount = trends.total_traces || 0;
+  const currentIntent = (trace.intent || '').toLowerCase();
+  const currentTopic  = currentIntent.charAt(0).toUpperCase() + currentIntent.slice(1);
+  const allTopicsSorted = Object.entries(intentRates).sort((a, b) => b[1] - a[1]);
+  const top4Topics   = allTopicsSorted.slice(0, 4);
+  const fabricLabels = top4Topics.map(([k]) => k.charAt(0).toUpperCase() + k.slice(1));
+  const fabricData   = top4Topics.map(([, v]) => v);
+  const fabricBarColors = fabricData.map(v => v >= 70 ? '#E24B4A' : v >= 40 ? '#EF9F27' : '#639922');
+  const hasFabricChart  = fabricLabels.length > 0;
+  let topicTakeaway;
+  if (!hasFabricChart || fabricTraceCount === 0) {
+    const topAny = allTopicsSorted[0];
+    topicTakeaway = topAny
+      ? `Not enough historical data for <strong style="font-weight:500">${currentTopic||'this topic'}</strong> yet. Across other topics, <strong style="font-weight:500">${topAny[0]}</strong> is flagged most often.`
+      : `Not enough historical data for <strong style="font-weight:500">${currentTopic||'this topic'}</strong> yet.`;
+  } else {
+    const top1 = allTopicsSorted[0], top2 = allTopicsSorted[1];
+    const topNames = top2
+      ? `<strong style="font-weight:500">${top1[0]}</strong> and <strong style="font-weight:500">${top2[0]}</strong>`
+      : `<strong style="font-weight:500">${top1[0]}</strong>`;
+    const currentRate = intentRates[currentIntent];
+    let riskNote = '';
+    if (currentRate !== undefined && top1) {
+      riskNote = currentRate >= top1[1] * 0.8
+        ? ` — this ${currentTopic.toLowerCase()||'current'} question is also high-risk`
+        : ` — this ${currentTopic.toLowerCase()||'current'} question is lower-risk`;
+    }
+    topicTakeaway = `Across ${fabricTraceCount} past questions, ${topNames} get flagged most${riskNote}.`;
+  }
+  const c6AllTopicsHtml = allTopicsSorted.map(([topic, rate]) => {
+    const rc6 = rate >= 70 ? '#E24B4A' : rate >= 40 ? '#EF9F27' : '#639922';
+    const label = topic.charAt(0).toUpperCase() + topic.slice(1);
+    const isCurrent = topic === currentIntent;
+    return `<div style="display:flex;align-items:center;gap:8px;padding:4px 0;border-bottom:1px solid rgba(0,0,0,0.04)">
+      <span style="font-size:11px;color:#2C2C2A;flex:1;font-weight:${isCurrent?'600':'400'}">${label}${isCurrent?' <span style="font-size:10px;color:#888780">(this trace)</span>':''}</span>
+      <span style="font-size:11px;font-weight:700;color:${rc6}">${rate}%</span>
+      <div style="width:60px;height:6px;background:rgba(0,0,0,0.06);border-radius:3px;overflow:hidden;flex-shrink:0">
+        <div style="height:100%;width:${Math.min(rate,100)}%;background:${rc6};border-radius:3px"></div>
+      </div>
+    </div>`;
+  }).join('');
+  const c6InsightsHtml = (fabric.insights||[]).map(ins => `
+    <div class="ms-nested" style="border-left:3px solid ${ins.severity==='high'?'#E24B4A':'#EF9F27'};border-radius:0 10px 10px 0;margin-bottom:6px">
+      <div style="font-size:11px;font-weight:600;color:${ins.severity==='high'?'#E24B4A':'#D97706'};margin-bottom:2px">${esc(ins.title)}</div>
+      <div style="font-size:11px;color:var(--text2);line-height:1.5">${esc(ins.detail)}</div>
+    </div>`).join('');
+  const card6 = `
+    <div class="ms-card">
+      <div class="ms-card-hd">
+        <span class="ms-card-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></span>
+        <span class="ms-card-title">Topic trends</span>
+        <span class="ms-card-sub">Fabric IQ</span>
+      </div>
+      <p class="ms-takeaway">${topicTakeaway}</p>
+      ${hasFabricChart
+        ? `<div style="position:relative;height:60px;flex-shrink:0" role="img" aria-label="Topic flag rate chart"><canvas id="ms-topic-${tid}"></canvas></div>`
+        : '<div class="ms-nested" style="font-size:11px;color:#888780">No trend data yet.</div>'}
+      <div class="ms-see-more" id="ms-sm-btn-6-${tid}" onclick="msSeeMore('ms-sm-exp-6-${tid}','ms-sm-btn-6-${tid}')">${_SM_DOWN} See more</div>
+      <div class="ms-expand" id="ms-sm-exp-6-${tid}">
+        <div class="ms-expand-inner">
+          ${allTopicsSorted.length ? `<div style="font-size:11px;font-weight:600;color:#2C2C2A;margin-bottom:8px">All topics — flag rate</div>${c6AllTopicsHtml}` : ''}
+          ${fabricTraceCount > 0 ? `<div style="margin-top:8px;font-size:10px;color:#888780">${fabricTraceCount} total traces · avg quality ${trends.avg_quality_score||'—'} · overall flag rate ${trends.flag_rate_pct||0}%</div>` : ''}
+          ${c6InsightsHtml ? `<div style="font-size:11px;font-weight:600;color:#2C2C2A;margin-top:10px;margin-bottom:6px">Pattern insights</div>${c6InsightsHtml}` : ''}
+          ${fabric.semantic_summary ? `<div style="font-size:10px;color:#888780;margin-top:8px;line-height:1.6;font-style:italic">${esc(fabric.semantic_summary)}</div>` : ''}
+          ${!allTopicsSorted.length && !c6InsightsHtml ? '<div style="font-size:11px;color:#888780">No historical Fabric IQ data yet for this deployment.</div>' : ''}
+        </div>
+      </div>
+    </div>`;
+
+  // ── CARD 7: Flags ──────────────────────────────────────────────────────────
+  const flagList = trace.flags || [];
+  let flagsContent;
+  if (flagList.length === 0) {
+    flagsContent = `<div class="ms-nested" style="border-left:3px solid #639922;border-radius:0 10px 10px 0;display:flex;align-items:flex-start;gap:8px">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#639922" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:1px"><polyline points="20 6 9 17 4 12"/></svg>
+      <div>
+        <div style="font-size:11px;font-weight:500;color:#27500A">No flags raised</div>
+        <div style="font-size:10px;color:#888780;margin-top:2px">This answer passed every automated check.</div>
+      </div>
+    </div>`;
+  } else {
+    flagsContent = flagList.map(f => {
+      const [rule,...rest] = f.split(': ');
+      const rec = _flagRecommendation(rule);
+      return `<div class="ms-nested" style="border-left:3px solid #E24B4A;border-radius:0 10px 10px 0;margin-bottom:6px">
+        <div style="font-size:11px;font-weight:500;color:#791F1F;margin-bottom:2px">${esc(rule)}</div>
+        <div style="font-size:10px;color:#888780;line-height:1.5">${esc(rest.join(': '))}</div>
+        ${rec ? `<div style="font-size:10px;color:var(--accent);margin-top:3px">→ ${esc(rec)}</div>` : ''}
+      </div>`;
+    }).join('');
+  }
+  const card7 = `
+    <div class="ms-card">
+      <div class="ms-card-hd">
+        <span class="ms-card-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg></span>
+        <span class="ms-card-title">Flags</span>
+        <span class="ms-card-sub">${flagList.length} flag${flagList.length !== 1 ? 's' : ''}</span>
+      </div>
+      ${flagsContent}
+      <div class="ms-see-more" id="ms-sm-btn-7-${tid}" onclick="msSeeMore('ms-sm-exp-7-${tid}','ms-sm-btn-7-${tid}')">${_SM_DOWN} See more</div>
+      <div class="ms-expand" id="ms-sm-exp-7-${tid}">
+        <div class="ms-expand-inner">
+          <div style="font-size:11px;font-weight:600;color:#2C2C2A;margin-bottom:6px">Evaluator verdict</div>
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+            <span style="font-size:13px;font-weight:700;padding:2px 10px;border-radius:20px;background:${vBg[ev.verdict||'REVIEW']||'#FFFBEB'};color:${vFg[ev.verdict||'REVIEW']||'#D97706'}">${ev.verdict||'—'}</span>
+            <span style="font-size:10px;color:#888780">(raw evaluator judgment — displayed verdict is score-derived)</span>
+            ${ev.summary ? `<span style="font-size:11px;color:var(--text2);line-height:1.55;font-style:italic">"${esc(ev.summary)}"</span>` : ''}
+          </div>
+          ${ev.missed_by_rules && ev.missed_by_rules !== 'none' && ev.missed_by_rules !== 'Unknown — evaluator did not complete'
+            ? `<div style="font-size:11px;font-weight:600;color:#2C2C2A;margin-bottom:4px;margin-top:8px">What the evaluator caught beyond rules</div>
+               <div style="font-size:11px;color:var(--text2);line-height:1.6">${esc(ev.missed_by_rules)}</div>` : ''}
+          <div style="margin-top:10px;font-size:11px;font-weight:600;color:#2C2C2A;margin-bottom:4px">What EyeOnAI checks for</div>
+          <div style="font-size:10px;color:#888780;line-height:1.75">Hallucination risk · Groundedness via NLI · Numeric/figure verification · Self-consistency · Citation integrity · Response completeness · Cost efficiency · Evaluator safety &amp; relevance</div>
+        </div>
+      </div>
+    </div>`;
+
+  // ── CARD 8: How to get a stronger answer next time ─────────────────────────
+  const allTips = [];
+  if ((rules.groundedness||0) < .7)           allTips.push('Add more specific context to your question so retrieval can find tighter-matching evidence.');
+  if ((ev.safety_score||1) < .6)              allTips.push('For sensitive topics, consult a qualified professional.');
+  if ((rules.hallucination_risk||0) > .4)     allTips.push('Try asking: "provide sources for all statistics" to force explicit citations.');
+  if ((rules.response_completeness||1) < .5)  allTips.push('The answer seems brief — try "Can you elaborate on this?"');
+  if ((rules.citation_integrity||1) < .7)     allTips.push('Rephrase to avoid phrases like "studies show" unless you want EyeOnAI to verify those claims against sources.');
+  if ((rules.cost_efficiency||1) < .6)        allTips.push('Simpler phrasing can reduce token usage and improve cost efficiency.');
+  if (!allTips.length) allTips.push('This answer scored well on all dimensions. Follow-up questions can drill into specific details.');
+  if (allTips.length < 2) allTips.push('Consider framing follow-up questions to explore specific parts of the answer more deeply.');
+  const makeTip = t => `<div style="display:flex;gap:8px;align-items:flex-start;padding:3px 0">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#185FA5" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:1px"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      <span style="font-size:11px;color:#2C2C2A;line-height:1.55">${esc(t)}</span>
+    </div>`;
+  const card8 = `
+    <div class="ms-card">
+      <div class="ms-card-hd">
+        <span class="ms-card-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></span>
+        <span class="ms-card-title">How to get a stronger answer next time</span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:6px">${allTips.slice(0,3).map(makeTip).join('')}</div>
+      <div class="ms-see-more" id="ms-sm-btn-8-${tid}" onclick="msSeeMore('ms-sm-exp-8-${tid}','ms-sm-btn-8-${tid}')">${_SM_DOWN} See more</div>
+      <div class="ms-expand" id="ms-sm-exp-8-${tid}">
+        <div class="ms-expand-inner">
+          ${allTips.length > 3 ? `<div style="font-size:11px;font-weight:600;color:#2C2C2A;margin-bottom:6px">More suggestions</div>
+          <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:10px">${allTips.slice(3).map(makeTip).join('')}</div>` : ''}
+          ${ev.summary ? `<div style="font-size:11px;font-weight:600;color:#2C2C2A;margin-bottom:4px">Evaluator's assessment</div>
+          <div style="font-size:11px;color:var(--text2);line-height:1.65;font-style:italic;margin-bottom:8px">"${esc(ev.summary)}"</div>` : ''}
+          ${ev.missed_by_rules && ev.missed_by_rules !== 'none' && ev.missed_by_rules !== 'Unknown — evaluator did not complete'
+            ? `<div style="font-size:11px;font-weight:600;color:#2C2C2A;margin-bottom:4px">What the evaluator noticed</div>
+               <div style="font-size:11px;color:var(--text2);line-height:1.6">${esc(ev.missed_by_rules)}</div>` : ''}
+        </div>
+      </div>
+    </div>`;
+
+  // ── Assemble layout ────────────────────────────────────────────────────────
+  rc.innerHTML = `<div class="ms-scroll">
+    <div class="ms-grid-3">${card1}${card2}${card3}</div>
+    <div class="ms-grid-3">${card4}${card5}${card6}</div>
+    <div class="ms-grid-1-2">${card7}${card8}</div>
+  </div>`;
+
+  setTimeout(() => _msDrawCharts(tid, metricEntries, counts, evidLabels, evidVals, evidColors, timeLabels, timeVals, timeColors, fabricLabels, fabricData, fabricBarColors, total), 0);
+} // end renderReport
+
+if (false) { // dead-code fence — old sec2-sec7 never runs
+  const disagreeHtml = disagree.length ? `
+    <div class="ms-nested" style="cursor:pointer;border-left:3px solid #EF9F27;border-radius:0 10px 10px 0;background:#FFFBEB;margin-top:10px"
+         onclick="event.stopPropagation();goToDisagreement('${tid}')">
+      <div style="font-size:11px;font-weight:700;color:#D97706;margin-bottom:2px">⚠ Scoring disagreement detected — ${disagree.length} item${disagree.length>1?'s':''}</div>
+      <div style="font-size:10px;color:var(--text2)">Click to view layer-by-layer analysis in Disagreement tab</div>
+    </div>` : '';
+
+  const metricExplain = [
+    ['Groundedness', (rules.groundedness||0).toFixed(2), 'Percentage of answer sentences with NLI entailment ≥ 0.5 against retrieved evidence chunks.'],
+    ['Hallucination Risk', (rules.hallucination_risk||0).toFixed(2), 'Weighted: 40% NLI entailment + 30% numeric/figure verification + 30% self-consistency across resampled responses.'],
+    ['Cost Efficiency', (rules.cost_efficiency||0).toFixed(2), 'Token usage for this response compared to the expected baseline for this question\'s complexity.'],
+    ['Citation Integrity', (rules.citation_integrity||0).toFixed(2), 'Checks whether citation-style phrases (e.g. "according to X") match an actual retrieved source.'],
+    ['Response Completeness', (rules.response_completeness||0).toFixed(2), 'Word count and structure compared to what\'s expected for this question type.'],
+  ].map(([name, val, desc]) => {
+    const c = parseFloat(val) >= 0.7 ? '#639922' : parseFloat(val) >= 0.4 ? '#EF9F27' : '#E24B4A';
+    return `<div style="margin-bottom:8px"><div style="display:flex;justify-content:space-between;margin-bottom:2px"><span style="font-size:11px;font-weight:600;color:#2C2C2A">${name}</span><span style="font-size:11px;font-weight:700;color:${c}">${val}</span></div><div style="font-size:10px;color:var(--muted);line-height:1.6">${desc}</div></div>`;
+  }).join('');
+
+  const sec2 = `
+    <div class="ms-card" style="cursor:pointer" onclick="msToggle('ms-exp-scores',document.getElementById('ms-hd-scores'))">
+      <div class="ms-card-hd" id="ms-hd-scores" style="cursor:pointer">
+        <span class="ms-card-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></span>
+        <span class="ms-card-title">Scoring Breakdown</span>
+        <span class="ms-card-sub">Rules Engine</span>
+        <span class="ms-card-chevron" id="ms-chv-scores">${CHEVRON}</span>
+      </div>
+      <div class="ms-card-body">
+        <div style="position:relative;height:80px" role="img" aria-label="Rules engine scores bar chart">
+          <canvas id="ms-bar-${tid}"></canvas>
+        </div>
+        ${disagreeHtml}
+      </div>
+      <div class="ms-expand" id="ms-exp-scores">
+        <div class="ms-expand-inner">${metricExplain}</div>
+      </div>
+    </div>`;
+
+  // ── SECTION 3: Evidence Trail (full width) ─────────────────────────────────
+  const usedIds = new Set(sa.map(s => s.supporting_chunk).filter(Boolean));
+  const chunkCardsHtml = chunks.length
+    ? chunks.map((c, i) => {
+        const sim = (c.similarity_score||0);
+        const simColor = sim>=.9 ? '#639922' : sim>=.7 ? '#EF9F27' : '#E24B4A';
+        const used = usedIds.has(c.chunk_id);
+        return `<div class="ms-nested" style="cursor:pointer" onclick="msToggleChunk('ms-chunk-${i}',this)">
+          <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px">
+            <span style="font-size:12px;font-weight:700;color:#185FA5;font-family:monospace">${esc(c.chunk_id)}</span>
+            <span style="font-size:12px;font-weight:700;color:${simColor}">${sim.toFixed(2)}</span>
+          </div>
+          <div style="font-size:11px;color:var(--muted);margin-bottom:4px">${esc(c.source)}</div>
+          ${used ? '<div style="font-size:10px;color:#639922;font-weight:600">✓ Used to support a sentence</div>' : ''}
+          <div id="ms-chunk-${i}" style="max-height:0;overflow:hidden;transition:max-height 0.3s ease;font-size:11px;color:var(--text2);line-height:1.6;margin-top:4px">${esc(c.content||'')}</div>
+        </div>`;
+      }).join('')
+    : '<div class="ms-nested" style="color:var(--muted);font-size:12px">No chunks retrieved — groundedness scores reflect this.</div>';
+
+  const sec3 = `
+    <div class="ms-card">
+      <div class="ms-card-hd" style="cursor:default">
+        <span class="ms-card-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg></span>
+        <span class="ms-card-title">Evidence Trail</span>
+        <span class="ms-card-sub">Foundry IQ · ${chunks.length} chunk${chunks.length!==1?'s':''}</span>
+      </div>
+      <div class="ms-card-body">
+        <div class="ms-chunk-grid">${chunkCardsHtml}</div>
+      </div>
+    </div>`;
+
+  // ── SECTION 4: Sentence Analysis (donut + highlights) ─────────────────────
+  const counts = {SUPPORTED:0, UNVERIFIED:0, CONTRADICTION:0, PARTIAL:0};
+  sa.forEach(s => { if (counts[s.verdict]!==undefined) counts[s.verdict]++; });
+  const total = sa.length;
+
+  const legendHtml = [
+    ['SUPPORTED', counts.SUPPORTED, '#639922'],
+    ['UNVERIFIED', counts.UNVERIFIED, '#9CA3AF'],
+    ['CONTRADICTION', counts.CONTRADICTION, '#E24B4A'],
+    ['PARTIAL', counts.PARTIAL, '#EF9F27'],
+  ].filter(([,n])=>n>0).map(([v,n,c])=>
+    `<div style="display:flex;align-items:center;gap:5px;font-size:11px;margin-bottom:4px">
+       <span style="width:8px;height:8px;border-radius:50%;background:${c};flex-shrink:0"></span>
+       <span style="font-weight:700;color:${c}">${n}</span>
+       <span style="color:var(--muted)">${v.toLowerCase()}</span>
+     </div>`
+  ).join('');
+
+  const sentVColor = {SUPPORTED:'#639922',PARTIAL:'#EF9F27',UNVERIFIED:'#9CA3AF',CONTRADICTION:'#E24B4A'};
+  const sentVBg    = {SUPPORTED:'#F0FDF4',PARTIAL:'#FFFBEB',UNVERIFIED:'#F3F4F6',CONTRADICTION:'#FEF2F2'};
+  const useDonut   = total >= 3;
+
+  // Priority sentences for the card body: contradictions first, then lowest-entailment unverified
+  const contradictions = sa.filter(s=>s.verdict==='CONTRADICTION');
+  const unverifiedSorted = sa.filter(s=>s.verdict==='UNVERIFIED').sort((a,b)=>(a.entailment_score||0)-(b.entailment_score||0));
+  // For few sentences show all; for many sentences show up to 2 priority ones
+  const bodyDisplaySents = total <= 2 ? sa : [...contradictions, ...unverifiedSorted].slice(0, 2);
+
+  const _sentCard = (s, compact) => {
+    const v = s.verdict||'UNVERIFIED';
+    const maxLen = compact ? 140 : 220;
+    const txt = s.sentence.length > maxLen ? s.sentence.slice(0, maxLen)+'…' : s.sentence;
+    return `<div class="ms-nested" style="margin-bottom:0">
+      <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
+        <span style="font-size:10px;font-weight:700;padding:1px 7px;border-radius:20px;background:${sentVBg[v]};color:${sentVColor[v]}">${v}</span>
+        ${s.supporting_chunk?`<span style="font-size:10px;color:var(--accent);font-family:monospace">${esc(s.supporting_chunk)}</span>`:''}
+        <span style="font-size:10px;color:var(--muted);margin-left:auto">ent ${(s.entailment_score||0).toFixed(2)}</span>
+      </div>
+      <div style="font-size:11px;color:var(--text2);line-height:1.55">${esc(txt)}</div>
+    </div>`;
+  };
+
+  const bodyDisplayHtml = bodyDisplaySents.length
+    ? `<div style="display:flex;flex-direction:column;gap:8px;margin-top:8px">${bodyDisplaySents.map(s=>_sentCard(s,true)).join('')}</div>`
+    : '';
+
+  const showAllLink = total > 2
+    ? `<div style="margin-top:8px;font-size:11px;color:var(--accent);cursor:pointer;font-weight:500" onclick="msToggle('ms-exp-sentences',document.getElementById('ms-hd-sentences'))">Show all ${total} sentences ↓</div>`
+    : '';
+
+  // Pills-only legend for low counts (used when no donut)
+  const pillsOnlyLegend = `<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px">
+    ${Object.entries(counts).filter(([,n])=>n>0).map(([v,n])=>
+      `<span style="font-size:11px;font-weight:600;padding:2px 9px;border-radius:20px;background:${sentVBg[v]};color:${sentVColor[v]}">${n} ${v.toLowerCase()}</span>`
+    ).join('')}
+  </div>`;
+
+  const allSentsHtml = sa.map(s => _sentCard(s, false)).join('<div style="height:6px"></div>');
+
+  const methodologyNote = `<div style="margin-bottom:8px;font-size:11px;color:var(--muted);line-height:1.7">Each sentence is checked against retrieved evidence using an NLI model. <strong>SUPPORTED</strong> means entailment ≥ 0.7. <strong>UNVERIFIED</strong> means no chunk supports or contradicts. <strong>CONTRADICTION</strong> means direct conflict (also caps hallucination risk at 0.3).</div>`;
+
+  const sec4 = `
+    <div class="ms-card">
+      <div class="ms-card-hd" id="ms-hd-sentences" onclick="msToggle('ms-exp-sentences',this)" style="cursor:pointer">
+        <span class="ms-card-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span>
+        <span class="ms-card-title">Sentence Analysis</span>
+        <span class="ms-card-sub">${total} sentence${total!==1?'s':''}</span>
+        <span class="ms-card-chevron">${CHEVRON}</span>
+      </div>
+      <div class="ms-card-body" style="padding-top:6px">
+        ${useDonut ? `
+          <div style="display:flex;gap:12px;align-items:center;margin-bottom:8px">
+            <div style="position:relative;width:72px;height:72px;flex-shrink:0" role="img" aria-label="Verdict distribution donut chart">
+              <canvas id="ms-donut-${tid}"></canvas>
+            </div>
+            <div>${legendHtml}</div>
+          </div>
+          ${bodyDisplayHtml}
+          ${showAllLink}
+        ` : `
+          ${pillsOnlyLegend}
+          ${bodyDisplayHtml}
+        `}
+      </div>
+      <div class="ms-expand" id="ms-exp-sentences">
+        <div class="ms-expand-inner">
+          ${methodologyNote}
+          ${total > 2 ? allSentsHtml : ''}
+        </div>
+      </div>
+    </div>`;
+
+  // ── SECTION 5: Pipeline Performance ───────────────────────────────────────
+  const SPAN_DESC = {
+    CAPTURE: 'Records the incoming question and initializes the trace.',
+    INTENT_ROUTER: 'Classifies the question into an intent category (e.g. career, finance, legal, health, general).',
+    RETRIEVER: 'Queries Foundry IQ to find relevant knowledge chunks for this intent.',
+    CHUNKS: 'Returns the retrieved evidence chunks with similarity scores.',
+    LLM_CALL: 'Generates the answer using the retrieved chunks as context.',
+    TOOL_CALLS: 'Fabric IQ checks for any additional tool-based verifications.',
+    FINAL_RESPONSE: 'Assembles the final answer for display.',
+    QUALITY_CHECK: 'Runs the full scoring pipeline: rules engine, evaluator agent, and disagreement analysis.',
+  };
+  const spans = trace.spans || [];
+  const tu = trace.token_usage || {};
+  const spansHtml = spans.map((sp, i) => {
+    const dotColor = sp.duration_ms >= 1000 ? '#EF9F27' : '#639922';
+    const iq = sp.iq_layer ? `<span style="font-size:10px;font-weight:600;padding:1px 6px;border-radius:4px;background:${sp.iq_layer.includes('Fabric')?'#FAF5FF':'#EFF6FF'};color:${sp.iq_layer.includes('Fabric')?'#7C3AED':'#2563EB'}">${esc(sp.iq_layer)}</span>` : '';
+    const desc = SPAN_DESC[sp.name] || '';
+    return `<div>
+      <div class="ms-span-row" onclick="msToggleSpan('ms-sp-${tid}-${i}')">
+        <span style="width:8px;height:8px;border-radius:50%;background:${dotColor};flex-shrink:0"></span>
+        <span style="font-size:11px;color:var(--text2);flex:1;text-transform:lowercase">${esc(sp.name)}</span>
+        ${iq}
+        <span style="font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums">${sp.duration_ms}ms</span>
+      </div>
+      ${desc ? `<div class="ms-span-detail" id="ms-sp-${tid}-${i}">${desc}</div>` : ''}
+    </div>`;
+  }).join('');
+
+  const sec5 = `
+    <div class="ms-card">
+      <div class="ms-card-hd" style="cursor:default">
+        <span class="ms-card-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></span>
+        <span class="ms-card-title">Pipeline</span>
+        <span class="ms-card-sub">${trace.total_duration_ms}ms total</span>
+      </div>
+      <div class="ms-card-body" style="padding-top:0">
+        ${spansHtml}
+        <div style="display:flex;gap:12px;margin-top:8px;font-size:10px;color:var(--muted);padding-top:6px;flex-wrap:wrap">
+          <span>Total: <strong style="color:var(--text)">${trace.total_duration_ms}ms</strong></span>
+          <span>Tokens: <strong style="color:var(--text)">${tu.total_tokens||0}</strong></span>
+          <span>Cost: <strong style="color:var(--text)">$${(trace.cost_estimate||0).toFixed(4)}</strong></span>
+        </div>
+      </div>
+    </div>`;
+
+  // ── SECTION 6: Pattern Intelligence (fabric bar chart) ────────────────────
+  const trends = fabric.trends || {};
+  const intentRates = trends.intent_flag_rates || {};
+  const fabricLabels = Object.keys(intentRates).map(k => k.charAt(0).toUpperCase()+k.slice(1));
+  const fabricData   = Object.values(intentRates);
+  const fabricBarColors = fabricData.map(v => v>=70 ? '#E24B4A' : v>=40 ? '#EF9F27' : '#639922');
+
+  const fabricTraceCount = trends.total_traces || 0;
+  const fabricSummary = (trends.flag_rate_pct != null && fabricTraceCount > 0)
+    ? `<div style="font-size:11px;color:var(--muted);margin-top:6px">${fabricTraceCount} traces · avg quality ${trends.avg_quality_score||'—'} · overall flag rate ${trends.flag_rate_pct}%</div>`
+    : '';
+
+  const insightCardsHtml = (fabric.insights||[]).map(ins => `
+    <div class="ms-nested" style="border-left:3px solid ${ins.severity==='high'?'#E24B4A':'#EF9F27'};border-radius:0 10px 10px 0;margin-bottom:6px">
+      <div style="font-size:11px;font-weight:700;color:${ins.severity==='high'?'#E24B4A':'#D97706'};margin-bottom:2px">${esc(ins.title)}</div>
+      <div style="font-size:11px;color:var(--text2);line-height:1.55">${esc(ins.detail)}</div>
+    </div>`).join('');
+
+  const hasFabricChart = fabricLabels.length > 0 && fabricTraceCount > 0;
+  const noDataNote = !hasFabricChart
+    ? `<div style="font-size:11px;color:var(--muted);display:flex;align-items:center;gap:6px;padding:8px 10px;background:rgba(0,0,0,0.03);border-radius:8px">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        Not enough historical data for this topic yet.
+      </div>`
+    : '';
+
+  const sec6 = `
+    <div class="ms-card" style="cursor:pointer" onclick="msToggle('ms-exp-fabric',document.getElementById('ms-hd-fabric'))">
+      <div class="ms-card-hd" id="ms-hd-fabric" style="cursor:pointer">
+        <span class="ms-card-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></span>
+        <span class="ms-card-title">Pattern Intelligence</span>
+        <span class="ms-card-sub">Fabric IQ</span>
+        <span class="ms-card-chevron">${CHEVRON}</span>
+      </div>
+      <div class="ms-card-body">
+        ${hasFabricChart
+          ? `<div style="position:relative;height:90px" role="img" aria-label="Flag rate by topic bar chart"><canvas id="ms-fabric-${tid}"></canvas></div>${fabricSummary}`
+          : noDataNote}
+      </div>
+      <div class="ms-expand" id="ms-exp-fabric">
+        <div class="ms-expand-inner">${insightCardsHtml||'<div style="color:var(--muted)">No pattern insights for this trace.</div>'}</div>
+      </div>
+    </div>`;
+
+  // ── SECTION 7: Flags & Tips ────────────────────────────────────────────────
+  const flagsHtml = (trace.flags||[]).length
+    ? (trace.flags||[]).map(f => {
+        const [rule,...rest] = f.split(': ');
+        const rec = _flagRecommendation(rule);
+        return `<div class="ms-nested" style="border-left:3px solid #E24B4A;border-radius:0 10px 10px 0;margin-bottom:6px">
+          <div style="font-size:11px;font-weight:700;color:#E24B4A;margin-bottom:2px">${esc(rule)}</div>
+          <div style="font-size:11px;color:var(--text2);line-height:1.55">${esc(rest.join(': '))}</div>
+          ${rec?`<div style="font-size:10px;color:var(--accent);margin-top:4px;font-weight:500">→ ${esc(rec)}</div>`:''}
+        </div>`;
+      }).join('')
+    : '<div style="font-size:12px;color:#639922;display:flex;align-items:center;gap:6px;padding:8px 12px;background:#F0FDF4;border-radius:10px">✓ All checks passed — no flags raised.</div>';
+
+  const tips = [];
+  if ((rules.groundedness||0)<.7) tips.push('Add more specific context to improve evidence grounding.');
+  if ((ev.safety_score||1)<.6) tips.push('For sensitive topics, consult a qualified professional.');
+  if ((rules.hallucination_risk||1)<.6) tips.push('Ask AI to cite sources explicitly: "Provide sources for all statistics."');
+  if ((rules.response_completeness||1)<.5) tips.push('Answer seems brief — try "Can you elaborate on…?"');
+  if (!tips.length) tips.push('This answer scored well on all dimensions.');
+  const tipsHtml = tips.slice(0,3).map(t=>`<div style="display:flex;gap:8px;font-size:11px;color:var(--text2);padding:5px 0;line-height:1.5"><span style="color:var(--accent);font-weight:700;flex-shrink:0">→</span><span>${esc(t)}</span></div>`).join('');
+
+  const sec7 = `
+    <div class="ms-card">
+      <div class="ms-card-hd" style="cursor:default">
+        <span class="ms-card-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg></span>
+        <span class="ms-card-title">Flags &amp; Tips</span>
+        <span class="ms-card-sub">${(trace.flags||[]).length} flag${(trace.flags||[]).length!==1?'s':''}</span>
+      </div>
+      <div class="ms-card-body">
+        ${flagsHtml}
+        <div style="margin-top:8px;border-top:1px solid rgba(0,0,0,0.05);padding-top:8px">${tipsHtml}</div>
+      </div>
+    </div>`;
+
+  } // end if(false) fence for dead old-section code
+
+function toggleSection(id) {
+  document.getElementById(id).classList.toggle('collapsed');
+}
+
+function msToggleChunk(id, cardEl) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  const open = el.style.maxHeight && el.style.maxHeight !== '0px';
+  el.style.maxHeight = open ? '0px' : el.scrollHeight + 'px';
+}
+
+function msToggleSpan(id) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.classList.toggle('open');
+}
+
+function _msDrawCharts(tid, metricEntries, sentCounts, evidLabels, evidVals, evidColors, timeLabels, timeVals, timeColors, fabricLabels, fabricData, fabricBarColors, sentTotal) {
+
+  // Chart 1 — Scoring breakdown (horizontal bar, 5 metrics)
+  const barCanvas = document.getElementById('ms-bar-' + tid);
+  if (barCanvas && typeof Chart !== 'undefined') {
+    const labels = metricEntries.map(([l]) => l);
+    const vals   = metricEntries.map(([,v]) => v);
+    const colors = vals.map(v => v >= .70 ? '#639922' : v >= .40 ? '#EF9F27' : '#E24B4A');
+    _msCharts['bar-'+tid] = new Chart(barCanvas, {
+      type: 'bar',
+      data: { labels, datasets: [{ data: vals, backgroundColor: colors, borderRadius: 3, barThickness: 'flex' }] },
+      options: {
+        indexAxis: 'y',
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => (ctx.raw*100).toFixed(0)+'%' } } },
+        scales: {
+          x: { min:0, max:1, display: false, grid: { display: false } },
+          y: { ticks: { font: { size: 8 }, color: '#888780' }, grid: { display: false }, border: { display: false } }
+        }
+      }
+    });
+  }
+
+  // Chart 2 — Sentence verdict donut (50×50, only if ≥2 sentences)
+  if (sentTotal >= 2) {
+    const donutCanvas = document.getElementById('ms-donut-' + tid);
+    if (donutCanvas && typeof Chart !== 'undefined') {
+      const vMap = {SUPPORTED:'#639922', UNVERIFIED:'#EF9F27', CONTRADICTION:'#E24B4A', PARTIAL:'#D3D1C7'};
+      const data = [], colors = [], labels = [];
+      Object.entries(sentCounts).forEach(([v,n]) => { if (n>0) { data.push(n); colors.push(vMap[v]||'#ccc'); labels.push(v); } });
+      if (data.length) {
+        _msCharts['donut-'+tid] = new Chart(donutCanvas, {
+          type: 'doughnut',
+          data: { labels, datasets: [{ data, backgroundColor: colors, borderWidth: 0 }] },
+          options: {
+            maintainAspectRatio: false,
+            cutout: '60%',
+            plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => ctx.label+': '+ctx.raw } } }
+          }
+        });
+      }
+    }
+  }
+
+  // Chart 3 — Evidence similarity (horizontal bar, source names)
+  const evidCanvas = document.getElementById('ms-evid-' + tid);
+  if (evidCanvas && typeof Chart !== 'undefined' && evidVals.length) {
+    _msCharts['evid-'+tid] = new Chart(evidCanvas, {
+      type: 'bar',
+      data: { labels: evidLabels, datasets: [{ data: evidVals, backgroundColor: evidColors, borderRadius: 3, barThickness: 'flex' }] },
+      options: {
+        indexAxis: 'y',
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => (ctx.raw*100).toFixed(0)+'% match' } } },
+        scales: {
+          x: { min:0, max:1, display: false, grid: { display: false } },
+          y: { ticks: { font: { size: 9 }, color: '#888780' }, grid: { display: false }, border: { display: false } }
+        }
+      }
+    });
+  }
+
+  // Chart 4 — Response time top-3 spans (horizontal bar, ms)
+  const timeCanvas = document.getElementById('ms-time-' + tid);
+  if (timeCanvas && typeof Chart !== 'undefined' && timeVals.length) {
+    _msCharts['time-'+tid] = new Chart(timeCanvas, {
+      type: 'bar',
+      data: { labels: timeLabels, datasets: [{ data: timeVals, backgroundColor: timeColors, borderRadius: 3, barThickness: 'flex' }] },
+      options: {
+        indexAxis: 'y',
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => ctx.raw+'ms' } } },
+        scales: {
+          x: { display: false, grid: { display: false } },
+          y: { ticks: { font: { size: 9 }, color: '#888780' }, grid: { display: false }, border: { display: false } }
+        }
+      }
+    });
+  }
+
+  // Chart 5 — Topic trends (vertical bar, flag rate %)
+  const topicCanvas = document.getElementById('ms-topic-' + tid);
+  if (topicCanvas && typeof Chart !== 'undefined' && fabricLabels.length) {
+    _msCharts['topic-'+tid] = new Chart(topicCanvas, {
+      type: 'bar',
+      data: { labels: fabricLabels, datasets: [{ data: fabricData, backgroundColor: fabricBarColors, borderRadius: 3, barThickness: 'flex' }] },
+      options: {
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => ctx.raw+'%' } } },
+        scales: {
+          y: { min:0, max:100, display: false, grid: { display: false } },
+          x: { ticks: { font: { size: 9 }, color: '#888780' }, grid: { display: false }, border: { display: false } }
+        }
+      }
+    });
+  }
+}
+
+function buildScoreCircle(score, color) {
+  const pct = Math.round(score * 100);
+  const r = 36, cx = 44, cy = 44;
+  const circ = 2 * Math.PI * r;
+  const dash = circ * score;
+  return `<svg class="score-circle" viewBox="0 0 88 88">
+    <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="var(--border)" stroke-width="6"/>
+    <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${color}" stroke-width="6"
+      stroke-dasharray="${dash} ${circ}" stroke-dashoffset="${circ/4}" stroke-linecap="round"
+      style="transition:stroke-dasharray .6s ease"/>
+    <text x="${cx}" y="${cy+1}" text-anchor="middle" dominant-baseline="middle"
+      fill="${color}" font-size="17" font-weight="800" font-family="Inter,system-ui,sans-serif">${pct}</text>
+  </svg>`;
+}
+
+function scoreBar(label, val, desc) {
+  val = val || 0;
+  const pct = Math.round(val*100);
+  const fill = val>=.85?'fill-green':val>=.70?'fill-yellow':'fill-red';
+  const col  = val>=.85?'var(--success)':val>=.70?'var(--warning)':'var(--danger)';
+  return `<div class="score-row">
+    <div class="score-row-head">
+      <span class="score-name" title="${esc(desc)}">${label}</span>
+      <span class="score-num" style="color:${col}">${val.toFixed(2)}</span>
+    </div>
+    <div class="score-bar"><div class="score-fill ${fill}" style="width:${pct}%"></div></div>
+  </div>`;
+}
+
+function scoreBarWithReason(label, val, reason) {
+  val = val || 0;
+  const pct = Math.round(val*100);
+  const fill = val>=.85?'fill-green':val>=.70?'fill-yellow':'fill-red';
+  const col  = val>=.85?'var(--success)':val>=.70?'var(--warning)':'var(--danger)';
+  return `<div class="score-row">
+    <div class="score-row-head">
+      <span class="score-name">${label}</span>
+      <span class="score-num" style="color:${col}">${val.toFixed(2)}</span>
+    </div>
+    <div class="score-bar"><div class="score-fill ${fill}" style="width:${pct}%"></div></div>
+    ${reason?`<div class="score-reason">${esc(reason)}</div>`:''}
+  </div>`;
+}
+
+function renderDisagreements(disagree) {
+  let html = `<div class="disagree-box"><div class="disagree-title">Scoring Disagreement Detected</div>`;
+  disagree.forEach(d => {
+    html += `<div class="disagree-item">
+      <strong>${esc(d.label)}</strong>
+      <div class="disagree-scores">
+        <span class="dscore dscore-rules">Rules: ${d.rules_score?.toFixed(2)||'?'}</span>
+        <span class="dscore dscore-eval">Evaluator: ${d.eval_score?.toFixed(2)||'?'}</span>
+      </div>
+      <div style="font-size:10px;color:var(--muted);margin-top:4px">${esc(d.reason||'')} — <strong style="color:var(--amber)">Human review advised</strong></div>
+    </div>`;
+  });
+  return html + '</div>';
+}
+
+function _getChunks(trace) {
+  for (const span of (trace.spans||[])) {
+    if (span.name === 'CHUNKS' && span.data?.chunks) return span.data.chunks;
+  }
+  return [];
+}
+
+function renderChunkCard(chunk, idx, usedChunkIds) {
+  const pct = Math.round((chunk.similarity_score||0)*100);
+  const fillColor = pct>90?'var(--success)':pct>80?'var(--warning)':'var(--accent)';
+  const used = usedChunkIds instanceof Set
+    ? usedChunkIds.has(chunk.chunk_id)
+    : false;
+  return `<div class="chunk-card">
+    <div class="chunk-head">
+      <span class="chunk-id">${esc(chunk.chunk_id)}</span>
+      <span class="chunk-src">${esc(chunk.source)}</span>
+      <span class="chunk-used" style="color:${used?'var(--success)':'var(--muted)'}">
+        ${used ? '✓ Used to support a sentence' : 'Not cited by any sentence'}
+      </span>
+    </div>
+    <div class="sim-bar-wrap">
+      <div class="sim-bar"><div class="sim-fill" style="width:${pct}%;background:${fillColor}"></div></div>
+      <span class="sim-val">similarity ${(chunk.similarity_score||0).toFixed(2)}</span>
+    </div>
+    <div class="chunk-content collapsed" id="chunk_${idx}">${esc(chunk.content||'')}</div>
+    <span class="chunk-toggle" onclick="toggleChunk(${idx})">Show more</span>
+  </div>`;
+}
+
+function toggleChunk(idx) {
+  const el = document.getElementById('chunk_'+idx);
+  const btn = el.nextElementSibling;
+  if (el.classList.contains('collapsed')) {
+    el.classList.remove('collapsed'); btn.textContent = 'Show less';
+  } else {
+    el.classList.add('collapsed'); btn.textContent = 'Show more';
+  }
+}
+
+function renderPipeline(trace) {
+  const spans = trace.spans || [];
+  if (!spans.length) return '<div style="color:var(--muted);font-size:12px">No span data.</div>';
+  let html = '';
+  spans.forEach(sp => {
+    const dotCls = sp.status==='ok'?'dot-ok':sp.status==='warning'?'dot-warning':'dot-error';
+    const iqBadge = sp.iq_layer ? `<span class="span-iq2">${esc(sp.iq_layer)}</span>` : '';
+    html += `<div class="span-row">
+      <div class="span-dot2 ${dotCls}"></div>
+      <div class="span-name2">${esc(sp.name)}</div>
+      ${iqBadge}
+      <div class="span-dur2">${sp.duration_ms}ms</div>
+    </div>`;
+  });
+  const tu = trace.token_usage || {};
+  html += `<div style="display:flex;gap:16px;margin-top:10px;font-size:11px;color:var(--muted)">
+    <span>Total: <strong style="color:var(--text)">${trace.total_duration_ms}ms</strong></span>
+    <span>Tokens: <strong style="color:var(--text)">${tu.total_tokens||0}</strong></span>
+    <span>Cost: <strong style="color:var(--text)">$${(trace.cost_estimate||0).toFixed(4)}</strong></span>
+  </div>`;
+  return html;
+}
+
+function renderFabricInsights(fabric, intent) {
+  if (!fabric || !fabric.insights) return '<div style="color:var(--muted);font-size:12px">No Fabric IQ data available.</div>';
+  const trends = fabric.trends || {};
+  let html = `<div style="font-size:11px;color:var(--muted);margin-bottom:10px">${esc(fabric.semantic_summary||'')}</div>`;
+  if (trends.flag_rate_pct != null) {
+    const intentRate = trends.intent_flag_rates?.[intent];
+    html += `<div class="kv-grid" style="margin-bottom:10px">
+      <div class="kv-key">Overall flag rate</div><div class="kv-val">${trends.flag_rate_pct}%</div>
+      ${intentRate!=null?`<div class="kv-key">${esc(intent)} flag rate</div><div class="kv-val">${intentRate}%</div>`:''}
+      <div class="kv-key">Avg quality</div><div class="kv-val">${trends.avg_quality_score}</div>
+    </div>`;
+  }
+  (fabric.insights||[]).forEach(ins => {
+    html += `<div class="fabric-insight fi-${ins.severity}">
+      <div class="fi-title">${esc(ins.title)}</div>
+      <div class="fi-detail">${esc(ins.detail)}</div>
+    </div>`;
+  });
+  return html;
+}
+
+function renderFlags(flags) {
+  if (!flags || !flags.length)
+    return `<div class="no-flags">All checks passed — this answer raised no flags.</div>`;
+  let html = '';
+  flags.forEach(f => {
+    const [rule, ...rest] = f.split(': ');
+    const explanation = rest.join(': ');
+    const rec = _flagRecommendation(rule);
+    html += `<div class="flag-item">
+      <div class="flag-icon">&#9873;</div>
+      <div class="flag-text">
+        <span class="flag-rule">${esc(rule)}</span>: ${esc(explanation)}
+        ${rec ? `<div style="color:var(--accent);margin-top:4px;font-size:10px;font-weight:500">→ ${esc(rec)}</div>` : ''}
+      </div>
+    </div>`;
+  });
+  return html;
+}
+
+function _flagRecommendation(rule) {
+  const recs = {
+    hallucination_risk: 'Cross-check specific figures against authoritative sources before acting.',
+    citation_integrity: 'Request sources or verify claims independently.',
+    no_evidence_with_claims: 'This answer is based on model training only — verify with a primary source.',
+    evaluator_safety: 'Consult a qualified professional before making decisions based on this answer.',
+    evaluator_verdict: 'Review manually — the evaluator found significant quality issues.',
+    user_negative_feedback: 'Rephrase your question with more context for a better answer.',
+    excessive_token_cost: 'Answer may be unnecessarily verbose — core information may still be accurate.',
+  };
+  for (const key of Object.keys(recs)) {
+    if (rule.includes(key)) return recs[key];
+  }
+  return '';
+}
+
+function renderTips(rules, evaluator, flags) {
+  const tips = [];
+  if ((rules.groundedness||0) < 0.7)
+    tips.push('Add more specific context to your question to improve evidence grounding.');
+  if ((evaluator.safety_score||1) < 0.6)
+    tips.push('For sensitive topics (health, legal, finance), consult a qualified professional.');
+  if ((rules.hallucination_risk||1) < 0.6)
+    tips.push('Ask the AI to cite its sources explicitly: "Provide sources for all statistics."');
+  if ((rules.response_completeness||1) < 0.5)
+    tips.push('The answer seems brief — try asking a follow-up with "Can you elaborate on…?"');
+  if (!tips.length)
+    tips.push('This answer scored well on all dimensions. No specific improvements needed.');
+  return tips.slice(0,3).map(t =>
+    `<div class="tip-item"><span class="tip-icon">→</span><span>${esc(t)}</span></div>`
+  ).join('');
+}
+
+// ─── Evaluator Agent Section ─────────────────────────────────────────────────
+function renderEvaluator(evaluator, trace) {
+  if (!evaluator || !evaluator.relevance_score) {
+    return '<div style="color:var(--muted);font-size:12px">Evaluator data not available for this trace.</div>';
+  }
+  const v       = evaluator.verdict || 'REVIEW';
+  const model   = evaluator.model_used || trace?.evaluator_scores?.model_used || 'evaluator';
+  const latency = evaluator.latency_ms || 0;
+  const tokens  = evaluator.tokens_used || 0;
+
+  const iconMap = {
+    PASS:   `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`,
+    FAIL:   `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>`,
+    REVIEW: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>`,
+  };
+
+  const missedHtml = (() => {
+    const m = (evaluator.missed_by_rules || '').trim();
+    if (!m || ['none','nothing','n/a'].includes(m.toLowerCase())) return '';
+    return `<div style="margin-top:10px;padding:10px 12px;background:#FFF7ED;border:1px solid #FED7AA;border-radius:8px;font-size:12px;line-height:1.6">
+      <strong style="color:#D97706">Caught by evaluator, missed by rules:</strong><br>${esc(m)}
+    </div>`;
+  })();
+
+  return `
+    <div class="eval-verdict-banner banner-${v}">
+      <div class="eval-verdict-icon eval-verdict-icon-${v}">${iconMap[v] || iconMap.REVIEW}</div>
+      <div>
+        <div class="eval-verdict-label eval-verdict-${v}">${v}</div>
+        <div class="eval-meta">Independent evaluation · ${esc(model)} · ${latency}ms · ${tokens} tokens</div>
+      </div>
+    </div>
+    <div class="eval-summary">${esc(evaluator.summary || '')}</div>
+    <div class="eval-scores">
+      ${scoreBarWithReason('Groundedness',       evaluator.groundedness_score,       evaluator.groundedness_reason)}
+      ${scoreBarWithReason('Hallucination',       evaluator.hallucination_score,      evaluator.hallucination_reason)}
+      ${scoreBarWithReason('Relevance',           evaluator.relevance_score,          evaluator.relevance_reason)}
+      ${scoreBarWithReason('Safety',              evaluator.safety_score,             evaluator.safety_reason)}
+      ${scoreBarWithReason('Clarity',             evaluator.clarity_score,            evaluator.clarity_reason)}
+      ${scoreBarWithReason('Citation Integrity',  evaluator.citation_integrity_score, evaluator.citation_integrity_reason)}
+      ${scoreBarWithReason('Completeness',        evaluator.completeness_score,       evaluator.completeness_reason)}
+    </div>
+    ${missedHtml}
+  `;
+}
+
+// ─── Confidence Assessment Section ───────────────────────────────────────────
+function renderConfidence(ca) {
+  if (!ca) {
+    return '<div style="color:var(--muted);font-size:12px">Confidence assessment not available for this trace.</div>';
+  }
+  const rScore  = ca.rules_implied_quality     || 0;
+  const eScore  = ca.evaluator_implied_quality  || 0;
+  const level   = ca.level || 'HIGH';
+  const delta   = ca.delta || 0;
+
+  const rColor = rScore >= 0.8 ? 'var(--success)' : rScore >= 0.6 ? 'var(--warning)' : 'var(--danger)';
+  const eColor = eScore >= 0.8 ? 'var(--success)' : eScore >= 0.6 ? 'var(--warning)' : 'var(--danger)';
+
+  const badgeIcon = level === 'HIGH'
+    ? `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>`
+    : `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/><circle cx="12" cy="12" r="10"/></svg>`;
+
+  return `
+    <div class="confidence-layers">
+      <div class="confidence-layer">
+        <div class="confidence-layer-label">Rules Engine</div>
+        <div class="confidence-value" style="color:${rColor}">${(rScore*100).toFixed(0)}</div>
+        <div class="confidence-sublabel">avg(groundedness, 1 − hallucination)</div>
+      </div>
+      <div class="confidence-layer">
+        <div class="confidence-layer-label">Evaluator Agent</div>
+        <div class="confidence-value" style="color:${eColor}">${(eScore*100).toFixed(0)}</div>
+        <div class="confidence-sublabel">avg(relevance, safety, clarity)</div>
+      </div>
+    </div>
+    <div class="confidence-badge confidence-${level}">
+      ${badgeIcon}
+      ${level === 'HIGH' ? 'HIGH CONFIDENCE — Both layers agree' : 'LOW CONFIDENCE — Layers disagree'}
+    </div>
+    <div class="confidence-delta">Δ Delta: <strong style="color:var(--text)">${(delta*100).toFixed(0)} points</strong> · threshold for disagreement: 25 points</div>
+    <div class="confidence-interp">${esc(ca.interpretation || '')}</div>
+  `;
+}
+
+// ─── Sentence Analysis ───────────────────────────────────────────────────────
+function renderSentenceAnalysis(sentenceAnalysis) {
+  if (!sentenceAnalysis || !sentenceAnalysis.length) {
+    return `<div style="color:var(--muted);font-size:12px;padding:4px 0">
+      Deep verification did not run for this answer (no sentence data available).
+    </div>`;
+  }
+
+  const counts = {SUPPORTED:0, PARTIAL:0, UNVERIFIED:0, CONTRADICTION:0};
+  sentenceAnalysis.forEach(s => { if (counts[s.verdict] !== undefined) counts[s.verdict]++; });
+
+  const pillStyle = {
+    SUPPORTED:    'background:#F0FDF4;color:var(--success);box-shadow:inset 0 1px 2px rgba(0,0,0,0.03)',
+    PARTIAL:      'background:#FFFBEB;color:var(--warning);box-shadow:inset 0 1px 2px rgba(0,0,0,0.03)',
+    UNVERIFIED:   'background:var(--bg2);color:var(--muted);box-shadow:inset 0 1px 2px rgba(0,0,0,0.03)',
+    CONTRADICTION:'background:#FEF2F2;color:var(--danger);box-shadow:inset 0 1px 2px rgba(0,0,0,0.03)',
+  };
+
+  let summary = `<div class="sent-analysis-summary">`;
+  for (const [v, n] of Object.entries(counts)) {
+    if (n > 0)
+      summary += `<span class="sent-count-pill" style="${pillStyle[v]}">${n} ${v}</span>`;
+  }
+  summary += `</div>`;
+
+  let html = summary;
+  sentenceAnalysis.forEach(s => {
+    const ent   = s.entailment_score  || 0;
+    const cons  = s.consistency_score || 0.75;
+    const v     = s.verdict || 'UNVERIFIED';
+    const entColor  = ent  >= 0.7 ? 'var(--success)' : ent  >= 0.4 ? 'var(--warning)' : 'var(--muted)';
+    const consColor = cons >= 0.7 ? 'var(--success)' : cons >= 0.5 ? 'var(--warning)' : 'var(--muted)';
+
+    const claims = (s.numeric_claims || []).map(c =>
+      `<span class="${c.verified ? 'sent-claim-verified' : 'sent-claim-unverified'}"
+        title="${c.verified ? 'Verified in evidence' : 'Not found in evidence'}"
+       >${esc(c.claim)}${c.verified ? ' ✓' : ' ✗'}</span>`
+    ).join(' ');
+
+    html += `<div class="sent-card">
+      <div class="sent-header">
+        <span class="sent-verdict sent-${v}">${v}</span>
+        ${s.supporting_chunk ? `<span class="sent-chunk-ref">${esc(s.supporting_chunk)}</span>` : ''}
+        ${s.contradicted ? `<span style="font-size:10px;font-weight:600;color:var(--danger);margin-left:4px">⚠ Contradiction</span>` : ''}
+      </div>
+      <div class="sent-text">${esc(s.sentence)}</div>
+      <div class="sent-scores">
+        <span class="sent-score-pill">Entailment
+          <span class="sent-score-val" style="color:${entColor}">${ent.toFixed(2)}</span>
+        </span>
+        <span class="sent-score-pill">Consistency
+          <span class="sent-score-val" style="color:${consColor}">${cons.toFixed(2)}</span>
+        </span>
+        ${claims ? `<span class="sent-score-pill">Claims: ${claims}</span>` : ''}
+      </div>
+    </div>`;
+  });
+  return html;
+}
+
+// ─── Agent Evaluation Tab ─────────────────────────────────────────────────────
+function updateAgentEvalTab(trace) {
+  // Add to dropdown (newest first)
+  const sel = document.getElementById('ae-trace-select');
+  const opt = document.createElement('option');
+  opt.value = trace.trace_id;
+  const q = trace.question.length > 60 ? trace.question.slice(0, 60) + '…' : trace.question;
+  opt.textContent = q;
+  sel.insertBefore(opt, sel.firstChild);
+  sel.value = trace.trace_id;
+
+  document.getElementById('ae-trace-bar').style.display = 'flex';
+  document.getElementById('ae-empty').style.display = 'none';
+  document.getElementById('ae-content').style.display = 'flex';
+  showAgentEval(trace.trace_id);
+}
+
+function showAgentEval(traceId) {
+  const trace = allTraces[traceId];
+  if (!trace) return;
+  _aeDestroyCharts();
+  _aeChartSpec = null;
+  document.getElementById('ae-content').innerHTML = renderAgentEvalPage(trace);
+  setTimeout(_aeDrawCharts, 0);
+}
+
+function _aeDrawCharts() {
+  if (!_aeChartSpec) return;
+  const { id, labels, values, colors } = _aeChartSpec;
+  const canvas = document.getElementById(id);
+  if (!canvas) return;
+  _aeCharts[id] = new Chart(canvas, {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [{
+        data: values,
+        backgroundColor: colors,
+        borderRadius: 3,
+        borderSkipped: false,
+      }]
+    },
+    options: {
+      indexAxis: 'y',
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: { callbacks: { label: ctx => ` ${ctx.raw}%` } }
+      },
+      scales: {
+        x: {
+          min: 0, max: 100,
+          grid: { color: '#F0EFEA' },
+          ticks: { font: { size: 9 }, callback: v => v + '%' },
+        },
+        y: {
+          grid: { display: false },
+          ticks: { font: { size: 9 } },
+        }
+      }
+    }
+  });
+}
+
+function aeMathItem(label, val, invert) {
+  val = val || 0;
+  const display = invert ? 1 - val : val;
+  const pct = Math.round(display * 100);
+  const color = display >= 0.8 ? '#16A34A' : display >= 0.55 ? '#D97706' : '#DC2626';
+  return `
+    <div class="ae-math-item">
+      <div class="ae-math-lbl">${label}</div>
+      <div class="ae-math-num" style="color:${color}">${pct}<span style="font-size:13px;font-weight:400;color:#6B7280">%</span></div>
+      <div class="ae-math-bar"><div class="ae-math-fill" style="width:${pct}%;background:${color}"></div></div>
+    </div>`;
+}
+
+function renderAgentEvalPage(trace) {
+  const ev        = trace.evaluator_scores || {};
+  const evalScore = ev.evaluator_score || 0;
+
+  const scoreCol = n => n >= 80 ? '#16A34A' : n >= 60 ? '#D97706' : '#DC2626';
+  const dimCol   = v => (v || 0) >= 0.80 ? '#16A34A' : (v || 0) >= 0.60 ? '#D97706' : '#DC2626';
+
+  const dims = [
+    { name: 'Groundedness',       val: ev.groundedness_score       || 0 },
+    { name: 'Hallucination',      val: ev.hallucination_score      || 0 },
+    { name: 'Relevance',          val: ev.relevance_score          || 0 },
+    { name: 'Safety',             val: ev.safety_score             || 0 },
+    { name: 'Clarity',            val: ev.clarity_score            || 0 },
+    { name: 'Citation Integrity', val: ev.citation_integrity_score || 0 },
+    { name: 'Completeness',       val: ev.completeness_score       || 0 },
+  ];
+
+  // Dynamic takeaway
+  const allStrong = dims.every(d => d.val >= 0.80);
+  let takeaway;
+  if (allStrong) {
+    takeaway = 'The evaluator found no weak areas in this answer.';
+  } else {
+    const lowest   = dims.reduce((a, b) => a.val < b.val ? a : b);
+    const strength = evalScore >= 80 ? 'strong' : evalScore >= 60 ? 'solid' : 'weak';
+    takeaway = `The evaluator rates this answer ${strength} overall, but flags ${lowest.name} as the weakest area (${Math.round(lowest.val * 100)}%).`;
+  }
+
+  // ── Left card: Evaluator Score ──────────────────────────────────────────────
+  const aeBarId     = `ae-eval-bar-${ev.latency_ms || 0}`;
+  const barLabels   = ['Grounded', 'Halluc.', 'Relevance', 'Safety', 'Clarity', 'Citation', 'Complete'];
+  const barValues   = dims.map(d => Math.round(d.val * 100));
+  const barColors   = dims.map(d => d.val >= 0.80 ? '#639922' : d.val >= 0.60 ? '#EF9F27' : '#E24B4A');
+  _aeChartSpec = { id: aeBarId, labels: barLabels, values: barValues, colors: barColors };
+
+  const metaLine = [ev.model_used, ev.latency_ms != null ? `${ev.latency_ms}ms` : null, ev.tokens_used ? `${ev.tokens_used} tokens` : null]
+    .filter(Boolean).join(' · ');
+
+  const sorted    = [...dims].sort((a, b) => b.val - a.val);
+  const top2      = sorted.slice(0, 2);
+  const strongBox = allStrong
+    ? `<div class="ms-nested" style="border-left:3px solid #639922;padding-left:10px;margin-top:8px">
+        <div style="font-size:10px;color:#639922;font-weight:500">Strongest: ${top2.map(d => `${d.name} (${Math.round(d.val*100)}%)`).join(', ')}</div>
+      </div>`
+    : '';
+
+  const leftCard = `
+    <div class="ms-card">
+      <div class="ms-card-hd">
+        <span class="ms-card-icon"><i class="ti ti-user" style="font-size:16px"></i></span>
+        <span class="ms-card-title">Evaluator Score</span>
+      </div>
+      <div class="ms-nested" style="display:flex;align-items:baseline;gap:4px;margin-bottom:10px">
+        <span class="ms-score-big" style="color:${scoreCol(evalScore)}">${evalScore}</span>
+        <span style="font-size:14px;color:#888780">/100</span>
+      </div>
+      <div style="font-size:10px;color:#888780;line-height:1.8;margin-bottom:8px">
+        Groundedness 20% · Hallucination 20% · Relevance 15%<br>Safety 15% · Clarity 10% · Citation 10% · Completeness 10%
+      </div>
+      <p class="ms-takeaway" style="margin-bottom:8px">${takeaway}</p>
+      <div style="position:relative;height:80px;margin-bottom:8px">
+        <canvas id="${aeBarId}" role="img" aria-label="Dimension scores bar chart"></canvas>
+      </div>
+      ${metaLine ? `<div class="ms-nested" style="font-size:11px;color:#888780;margin-bottom:0">${metaLine}</div>` : ''}
+      ${strongBox}
+    </div>`;
+
+  // ── Right card: Dimension Scores ─────────────────────────────────────────────
+  const dimItem = (label, val) => {
+    const pct = Math.round((val || 0) * 100);
+    const col = dimCol(val);
+    return `
+      <div class="ms-nested">
+        <div style="font-size:10px;color:#888780;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:3px">${label}</div>
+        <div style="font-size:18px;font-weight:500;color:${col};line-height:1.2">${pct}<span style="font-size:11px;font-weight:400;color:#888780">%</span></div>
+        <div style="height:4px;background:#E5E3D4;border-radius:2px;margin-top:5px"><div style="height:100%;width:${pct}%;background:${col};border-radius:2px"></div></div>
+      </div>`;
+  };
+
+  const rightCard = `
+    <div class="ms-card">
+      <div class="ms-card-hd">
+        <span class="ms-card-icon"><i class="ti ti-list-check" style="font-size:16px"></i></span>
+        <span class="ms-card-title">Dimension Scores</span>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;flex:1">
+        ${dims.map(d => dimItem(d.name, d.val)).join('')}
+      </div>
+    </div>`;
+
+  // ── Detail card: verdict + summary + dimension reasons + missed_by_rules ────
+  const v        = ev.verdict || 'REVIEW';
+  const vColor   = { PASS:'#16A34A', FAIL:'#DC2626', REVIEW:'#D97706' }[v] || '#D97706';
+  const vBg      = { PASS:'#F0FDF4', FAIL:'#FEF2F2', REVIEW:'#FFFBEB' }[v] || '#FFFBEB';
+  const verdictBadge = `<span style="display:inline-flex;align-items:center;font-size:11px;font-weight:600;color:${vColor};background:${vBg};padding:4px 10px;border-radius:999px">${v}</span>`;
+
+  const detailCard = `
+    <div class="ms-card">
+      <div class="ms-card-hd">
+        <span class="ms-card-icon"><i class="ti ti-robot" style="font-size:16px"></i></span>
+        <span class="ms-card-title">Evaluator Detail — Layer 2</span>
+        <span style="margin-left:auto">${verdictBadge}</span>
+      </div>
+      <div style="padding-top:4px">
+        ${renderEvaluator(ev, trace)}
+      </div>
+    </div>`;
+
+  return `
+    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;align-items:stretch">
+      ${leftCard}
+      ${rightCard}
+    </div>
+    ${detailCard}`;
+}
+
+// ─── Disagreement Tab ─────────────────────────────────────────────────────────
+function updateDisagreementTab(trace) {
+  const sel = document.getElementById('dg-trace-select');
+  const opt = document.createElement('option');
+  opt.value = trace.trace_id;
+  const q = trace.question.length > 60 ? trace.question.slice(0, 60) + '…' : trace.question;
+  opt.textContent = q;
+  sel.insertBefore(opt, sel.firstChild);
+  sel.value = trace.trace_id;
+
+  document.getElementById('dg-trace-bar').style.display = 'flex';
+  document.getElementById('dg-empty').style.display = 'none';
+  document.getElementById('dg-content').style.display = 'flex';
+  showDisagreement(trace.trace_id);
+}
+
+function showDisagreement(traceId) {
+  const trace = allTraces[traceId];
+  if (!trace) return;
+  _dgDestroyCharts();
+  _dgChartSpecs = [];
+  document.getElementById('dg-content').innerHTML = renderDisagreementPage(trace);
+  setTimeout(_dgDrawCharts, 0);
+}
+
+function _dgDrawCharts() {
+  _dgChartSpecs.forEach(({ id, rulesVal, evalVal }) => {
+    const canvas = document.getElementById(id);
+    if (!canvas) return;
+    _dgCharts[id] = new Chart(canvas, {
+      type: 'bar',
+      data: {
+        labels: ['Rules engine', 'Evaluator'],
+        datasets: [{
+          data: [rulesVal, evalVal],
+          backgroundColor: ['#EF9F27', '#7F77DD'],
+          borderRadius: 4,
+          borderSkipped: false,
+        }]
+      },
+      options: {
+        indexAxis: 'y',
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: { callbacks: { label: ctx => ` ${ctx.raw}%` } }
+        },
+        scales: {
+          x: {
+            min: 0, max: 100,
+            grid: { color: '#F0EFEA' },
+            ticks: { font: { size: 9 }, callback: v => v + '%' },
+          },
+          y: {
+            grid: { display: false },
+            ticks: { font: { size: 10 } },
+          }
+        }
+      }
+    });
+  });
+}
+
+function dgBar(val, color) {
+  const pct = Math.round((val || 0) * 100);
+  return `
+    <div class="dg-metric-row">
+      <div class="dg-bar-track"><div class="dg-bar-fill" style="width:${pct}%;background:${color}"></div></div>
+      <div class="dg-bar-pct" style="color:${color}">${pct}%</div>
+    </div>`;
+}
+
+function dgDeltaRow(label, delta) {
+  const warn = delta > 0.25;
+  const col  = warn ? '#D97706' : '#16A34A';
+  const icon = warn
+    ? `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> Alert`
+    : `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Within threshold`;
+  return `
+    <div class="dg-delta-row">
+      <div class="dg-delta-lbl">${label}</div>
+      <div class="dg-delta-num" style="color:${col}">${(delta * 100).toFixed(0)}<span style="font-size:12px;font-weight:400;color:var(--muted)"> pts</span></div>
+      <div class="dg-delta-badge ${warn ? 'dg-delta-warn' : 'dg-delta-ok'}">${icon}</div>
+    </div>`;
+}
+
+function renderDisagreementPage(trace) {
+  const ca = trace.confidence_assessment;
+  if (!ca) {
+    return `<div style="padding:40px;text-align:center;color:var(--muted);font-size:13px">
+      Disagreement analysis not available for this trace — re-run the question to generate it.
+    </div>`;
+  }
+
+  const rules = trace.rules_scores        || {};
+  const ev    = trace.evaluator_scores    || {};
+  const tid   = trace.trace_id;
+  const level = ca.level || 'HIGH';
+  const isLow = level === 'LOW';
+
+  const rulesQColor  = ca.rules_implied_quality    >= .7 ? '#0D9488' : '#D97706';
+  const evalQColor   = ca.evaluator_implied_quality >= .7 ? '#7C3AED' : '#D97706';
+  const rulesHColor  = ca.rules_no_halluc          >= .7 ? '#0D9488' : '#D97706';
+  const evalHColor   = ca.eval_halluc_confidence   >= .7 ? '#7C3AED' : '#D97706';
+
+  // ── Confidence banner (restyled as ms-card) ────────────────────────────────
+  const nSig = ((ca.halluc_delta || 0) > 0.25 ? 1 : 0) + ((ca.quality_delta || ca.delta || 0) > 0.25 ? 1 : 0);
+  const bannerSub = isLow
+    ? `The rules engine and evaluator disagree on ${nSig} dimension(s) for this answer.`
+    : 'Both scoring layers agree on this answer.';
+  const banner = `
+    <div class="ms-card" style="flex-direction:row;align-items:center;gap:14px">
+      <i class="ti ti-${isLow ? 'alert-triangle' : 'check'}" style="font-size:22px;color:${isLow ? '#854F0B' : '#639922'};flex-shrink:0"></i>
+      <div>
+        <div style="font-size:14px;font-weight:500;color:${isLow ? '#791F1F' : '#27500A'};margin-bottom:3px">
+          ${isLow ? 'LOW CONFIDENCE — Human Review Advised' : 'HIGH CONFIDENCE'}
+        </div>
+        <div style="font-size:11px;color:#888780">${bannerSub}</div>
+      </div>
+    </div>`;
+
+  // ── Side-by-side layer cards (compact + see-more for method detail) ──────────
+  const rulesMethodDetail = `NLI entailment score: ${((ca.rules_no_halluc || 0) * 100).toFixed(0)}% hallucination-safe
+Numeric verification: facts matched against retrieved chunks
+Self-consistency: 2× LLM samples, cosine similarity via sentence-transformers
+Groundedness: ${((rules.groundedness || 0) * 100).toFixed(0)}% of answer maps to evidence`;
+
+  const evalReasonDetail = ev.safety_reason || ev.summary || 'Evaluator reasoning not available.';
+
+  const layerCards = `
+    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;align-items:stretch">
+      <div class="ms-card">
+        <div class="ms-card-hd">
+          <span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;background:#FEF3C7;color:#B45309;margin-right:2px">L1</span>
+          <span class="ms-card-title">Rules Engine</span>
+        </div>
+        <p class="ms-takeaway" style="margin-bottom:8px">Deterministic scoring via NLI entailment, numeric checks, and self-consistency sampling.</p>
+        <div class="ms-nested" style="margin-bottom:8px">
+          <div style="font-size:10px;color:#888780;margin-bottom:4px">Hallucination confidence</div>
+          ${dgBar(ca.rules_no_halluc, rulesHColor)}
+          <div style="font-size:10px;color:#888780;margin-top:8px;margin-bottom:4px">Overall quality</div>
+          ${dgBar(ca.rules_implied_quality, rulesQColor)}
+        </div>
+        <button class="ms-see-more" id="dg-sm-l1-${tid}" onclick="msSeeMore('dg-exp-l1-${tid}','dg-sm-l1-${tid}')">${_SM_DOWN} See more</button>
+        <div class="ms-expand" id="dg-exp-l1-${tid}">
+          <div class="ms-expand-inner" style="white-space:pre-line">${esc(rulesMethodDetail)}</div>
+        </div>
+      </div>
+      <div class="ms-card">
+        <div class="ms-card-hd">
+          <span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;background:#EDE9FE;color:#6D28D9;margin-right:2px">L2</span>
+          <span class="ms-card-title">Evaluator Agent</span>
+        </div>
+        <p class="ms-takeaway" style="margin-bottom:8px">Independent AI judgment · ${esc(ev.model_used || 'evaluator')} · ${ev.latency_ms || 0}ms · ${ev.tokens_used || 0} tokens</p>
+        <div class="ms-nested" style="margin-bottom:8px">
+          <div style="font-size:10px;color:#888780;margin-bottom:4px">Hallucination confidence</div>
+          ${dgBar(ca.eval_halluc_confidence, evalHColor)}
+          <div style="font-size:10px;color:#888780;margin-top:8px;margin-bottom:4px">Overall quality</div>
+          ${dgBar(ca.evaluator_implied_quality, evalQColor)}
+        </div>
+        <button class="ms-see-more" id="dg-sm-l2-${tid}" onclick="msSeeMore('dg-exp-l2-${tid}','dg-sm-l2-${tid}')">${_SM_DOWN} See more</button>
+        <div class="ms-expand" id="dg-exp-l2-${tid}">
+          <div class="ms-expand-inner">${esc(evalReasonDetail)}</div>
+        </div>
+      </div>
+    </div>`;
+
+  // ── Delta visualization (2-col with gap bars) ────────────────────────────
+  const dgGapBar = (l1, l2, warn) => {
+    const lo  = Math.min(l1, l2);
+    const hi  = Math.max(l1, l2);
+    const col = warn ? '#EF9F27' : '#639922';
+    return `
+      <div style="position:relative;height:6px;background:#E5E3D4;border-radius:3px;margin:6px 0 4px">
+        <div style="position:absolute;left:${lo}%;width:${hi - lo}%;height:100%;background:${col};opacity:0.35;border-radius:3px"></div>
+        <div style="position:absolute;left:${l1}%;transform:translateX(-50%);width:8px;height:8px;border-radius:50%;background:#EF9F27;top:-1px;border:2px solid #FFFDF0;box-shadow:0 1px 2px rgba(0,0,0,.2)"></div>
+        <div style="position:absolute;left:${l2}%;transform:translateX(-50%);width:8px;height:8px;border-radius:50%;background:#7F77DD;top:-1px;border:2px solid #FFFDF0;box-shadow:0 1px 2px rgba(0,0,0,.2)"></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:9px;color:#888780">
+        <span>L1: ${l1}%</span><span>L2: ${l2}%</span>
+      </div>`;
+  };
+
+  const dgDeltaCell = (label, delta, l1val, l2val) => {
+    const warn     = delta > 0.25;
+    const deltaPct = Math.round(delta * 100);
+    const col      = warn ? '#BA7517' : '#639922';
+    const l1p      = Math.round((l1val || 0) * 100);
+    const l2p      = Math.round((l2val || 0) * 100);
+    const badge    = warn
+      ? `<span style="font-size:9px;font-weight:600;background:#FEF3C7;color:#BA7517;padding:2px 6px;border-radius:999px;margin-left:6px">Alert</span>`
+      : `<span style="font-size:9px;font-weight:600;background:#F0FDF4;color:#639922;padding:2px 6px;border-radius:999px;margin-left:6px">OK</span>`;
+    return `
+      <div class="ms-nested">
+        <div style="font-size:11px;color:#888780;margin-bottom:4px">${label}</div>
+        <div style="display:flex;align-items:baseline;gap:2px">
+          <span style="font-size:24px;font-weight:500;color:${col}">${deltaPct}</span>
+          <span style="font-size:11px;color:#888780"> pts</span>
+          ${badge}
+        </div>
+        ${dgGapBar(l1p, l2p, warn)}
+      </div>`;
+  };
+
+  const deltas = `
+    <div class="ms-card">
+      <div class="ms-card-hd">
+        <span class="ms-card-icon"><i class="ti ti-arrows-diff" style="font-size:15px"></i></span>
+        <span class="ms-card-title">Layer Delta</span>
+        <span class="ms-card-sub">threshold: 25 pts</span>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        ${dgDeltaCell('Hallucination assessment', ca.halluc_delta || 0, ca.rules_no_halluc, ca.eval_halluc_confidence)}
+        ${dgDeltaCell('Overall quality', ca.quality_delta || ca.delta || 0, ca.rules_implied_quality, ca.evaluator_implied_quality)}
+      </div>
+    </div>`;
+
+  // ── Interpretation (2-col: text + quality comparison visual) ───────────────
+  const rq  = Math.round((ca.rules_implied_quality    || 0) * 100);
+  const eq  = Math.round((ca.evaluator_implied_quality || 0) * 100);
+  const rh  = Math.round((ca.rules_no_halluc          || 0) * 100);
+  const eh  = Math.round((ca.eval_halluc_confidence   || 0) * 100);
+
+  const miniBar = (label, val, col) => `
+    <div style="margin-bottom:7px">
+      <div style="display:flex;justify-content:space-between;font-size:9px;color:#888780;margin-bottom:2px">
+        <span>${label}</span><span style="color:${col};font-weight:500">${val}%</span>
+      </div>
+      <div style="height:6px;background:#E5E3D4;border-radius:3px">
+        <div style="height:100%;width:${val}%;background:${col};border-radius:3px"></div>
+      </div>
+    </div>`;
+
+  const interpFull  = ca.interpretation || '';
+  const interpSents = interpFull.split('.');
+  const interpShort = interpSents[0] + (interpSents.length > 1 ? '.' : '');
+  const interpHasMore = interpFull.length > interpShort.length + 1;
+
+  const interp = `
+    <div class="ms-card">
+      <div class="ms-card-hd">
+        <span class="ms-card-icon"><i class="ti ti-info-circle" style="font-size:15px"></i></span>
+        <span class="ms-card-title">Interpretation</span>
+      </div>
+      <p class="ms-takeaway">${esc(interpShort)}</p>
+      ${interpHasMore ? `
+      <button class="ms-see-more" id="dg-sm-interp-${tid}" onclick="msSeeMore('dg-exp-interp-${tid}','dg-sm-interp-${tid}')">${_SM_DOWN} See more</button>
+      <div class="ms-expand" id="dg-exp-interp-${tid}">
+        <div class="ms-expand-inner">${esc(interpFull)}</div>
+      </div>` : ''}
+    </div>`;
+
+  // (Reasoning detail moved into See more panels of layerCards above)
+
+  // ── Root-cause analysis (chart + text hybrid) ─────────────────────────────
+  const dimLabel = { hallucination: 'Hallucination Confidence', overall_quality: 'Overall Quality' };
+  const dimIcon  = { hallucination: 'ti-search', overall_quality: 'ti-star' };
+
+  const patternPill = cause => {
+    const cfg = {
+      scope_mismatch:              { bg: '#EEEDFE', col: '#3C3489', text: 'Scope mismatch' },
+      fluency_vs_grounding_gap:    { bg: '#FAEEDA', col: '#854F0B', text: 'Fluency vs grounding gap' },
+      evaluator_overcaution:       { bg: '#FCEBEB', col: '#791F1F', text: 'Evaluator overcaution' },
+      format_vs_substance:         { bg: '#FAEEDA', col: '#854F0B', text: 'Format vs substance' },
+      missing_attribution_phrases: { bg: '#FAEEDA', col: '#854F0B', text: 'Missing attribution phrases' },
+      length_vs_substance:         { bg: '#FAEEDA', col: '#854F0B', text: 'Length vs substance' },
+    };
+    const c = cfg[cause] || { bg: '#F3F4F6', col: '#374151', text: cause.replace(/_/g,' ') };
+    return `<span style="display:inline-flex;font-size:10px;font-weight:500;padding:3px 10px;border-radius:999px;margin-top:6px;background:${c.bg};color:${c.col}">Pattern: ${c.text}</span>`;
+  };
+
+  const analyses = ca.disagreement_analyses || [];
+  const missed   = (ev.missed_by_rules || '').trim();
+  const showMissed = missed && !['none','nothing','n/a','no','nothing significant'].includes(missed.toLowerCase());
+
+  let rootCause = '';
+  if (isLow && (analyses.length || showMissed)) {
+    const dimCards = analyses.map((a, i) => {
+      const name      = dimLabel[a.dimension] || a.dimension;
+      const icon      = dimIcon[a.dimension]  || 'ti-chart-bar';
+      const rulesVal  = Math.round((a.rules_score      || 0) * 100);
+      const evalVal   = Math.round((a.evaluator_score  || 0) * 100);
+      const chartId   = `dg-chart-${tid}-${i}`;
+      _dgChartSpecs.push({ id: chartId, rulesVal, evalVal });
+
+      const evidenceHtml = (a.evidence || []).length ? `
+        <div style="margin-top:8px">
+          <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#888780;margin-bottom:4px">Unsupported claims</div>
+          ${a.evidence.map(e => {
+            const claimsStr = (e.claims || []).map(c => `${c.claim}${c.verified ? ' ✓' : ' ✗'}`).join(' · ');
+            return `<div class="dg-evidence-item" style="margin-bottom:4px">
+              <div class="dg-evidence-sent">${esc(e.sentence)}</div>
+              <div class="dg-evidence-meta">Entailment: ${((e.entailment || 0) * 100).toFixed(0)}%${claimsStr ? ' · ' + esc(claimsStr) : ''}</div>
+            </div>`;
+          }).join('')}
+        </div>` : '';
+
+      const smBtnId = `dg-sm-rc-${tid}-${i}`;
+      const smExpId = `dg-exp-rc-${tid}-${i}`;
+      return `
+        <div class="ms-card">
+          <div class="ms-card-hd">
+            <span class="ms-card-icon"><i class="ti ${icon}" style="font-size:15px"></i></span>
+            <span style="font-size:12px;font-weight:500;color:#2C2C2A">${name}</span>
+            <span style="margin-left:auto;font-size:10px;color:#888780">L1 ${rulesVal}% → L2 ${evalVal}%</span>
+          </div>
+          <div style="position:relative;height:65px;margin-bottom:8px">
+            <canvas id="${chartId}" role="img" aria-label="${name}: Rules engine ${rulesVal}%, Evaluator ${evalVal}%">Rules engine ${rulesVal}%, Evaluator ${evalVal}%</canvas>
+          </div>
+          ${a.likely_cause ? patternPill(a.likely_cause) : ''}
+          <button class="ms-see-more" id="${smBtnId}" onclick="msSeeMore('${smExpId}','${smBtnId}')">${_SM_DOWN} See more</button>
+          <div class="ms-expand" id="${smExpId}">
+            <div class="ms-expand-inner">
+              <div style="font-size:11px;color:#2C2C2A;line-height:1.65;margin-bottom:${evidenceHtml ? '8px' : '0'}">${esc(a.explanation || '')}</div>
+              ${evidenceHtml}
+            </div>
+          </div>
+        </div>`;
+    }).join('');
+
+    const missedShort = missed.length > 120 ? missed.slice(0, 120).trimEnd() + '…' : missed;
+    const missedCard = showMissed ? `
+      <div class="ms-card">
+        <div class="ms-card-hd">
+          <span class="ms-card-icon"><i class="ti ti-bulb" style="font-size:15px"></i></span>
+          <span style="font-size:12px;font-weight:500;color:#2C2C2A">Evaluator-only observation</span>
+        </div>
+        <p class="ms-takeaway" style="margin-bottom:6px">${esc(missedShort)}</p>
+        <span style="display:inline-flex;font-size:10px;font-weight:500;padding:3px 10px;border-radius:999px;background:#E1F5EE;color:#085041">Pattern: Evaluator caught — rules engine missed</span>
+        ${missed.length > 120 ? `
+        <button class="ms-see-more" id="dg-sm-missed-${tid}" onclick="msSeeMore('dg-exp-missed-${tid}','dg-sm-missed-${tid}')">${_SM_DOWN} See more</button>
+        <div class="ms-expand" id="dg-exp-missed-${tid}">
+          <div class="ms-expand-inner">${esc(missed)}</div>
+        </div>` : ''}
+      </div>` : '';
+
+    const cols = analyses.length >= 2 ? '1fr 1fr' : '1fr';
+    rootCause = `
+      <div>
+        <div style="font-size:13px;font-weight:500;color:#854F0B;margin-bottom:8px">Why the layers disagree</div>
+        <div style="display:grid;grid-template-columns:${cols};gap:12px;align-items:stretch">
+          ${dimCards}
+        </div>
+        ${missedCard || ''}
+      </div>`;
+  }
+
+  const deltasInterpRow = `<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;align-items:stretch">${deltas}${interp}</div>`;
+  return banner + layerCards + deltasInterpRow + rootCause;
+}
+
+// ─── Download Report ──────────────────────────────────────────────────────────
+function downloadReport(traceId) {
+  const trace = allTraces[traceId];
+  if (!trace) return;
+  const ev    = trace.evaluator_scores    || {};
+  const rules = trace.rules_scores        || {};
+  const ca    = trace.confidence_assessment || {};
+  const sa    = trace.sentence_analysis   || [];
+  const overall = trace.quality_scores?.overall || 0;
+  const verdict = ev.verdict || trace.quality_scores?.verdict || '';
+
+  const tableStyle = 'width:100%;border-collapse:collapse;font-size:13px;margin-top:10px';
+  const thStyle = 'text-align:left;padding:8px 10px;background:#F5F4F1;border:1px solid #E8E6E1;font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:#6B7280';
+  const tdStyle = 'padding:8px 10px;border:1px solid #E8E6E1;vertical-align:top';
+  const pct = v => ((v||0)*100).toFixed(0) + '%';
+  const vColor = {PASS:'#16A34A',FAIL:'#DC2626',REVIEW:'#D97706'};
+
+  const chunks = _getChunks(trace);
+  const usedIds = new Set(sa.map(s => s.supporting_chunk).filter(Boolean));
+
+  const saRows = sa.map(s => {
+    const nc = s.numeric_claims || [];
+    const claimsHtml = nc.length
+      ? nc.map(c => `${c.claim}${c.verified ? ' ✓' : ' ✗'}`).join(' · ')
+      : '—';
+    return `<tr>
+      <td style="${tdStyle};font-size:12px;max-width:340px">${s.sentence||''}</td>
+      <td style="${tdStyle};font-weight:700;color:${s.verdict==='SUPPORTED'?'#16A34A':s.verdict==='CONTRADICTION'?'#DC2626':s.verdict==='PARTIAL'?'#D97706':'#6B7280'}">${s.verdict||''}</td>
+      <td style="${tdStyle}">${((s.entailment_score||0)*100).toFixed(0)}%</td>
+      <td style="${tdStyle};font-size:11px;color:#374151">${claimsHtml}</td>
+    </tr>`;
+  }).join('');
+
+  const chunkRows = chunks.map((c, i) => {
+    const sim = ((c.similarity_score||0)*100).toFixed(0);
+    const cited = usedIds.has(c.chunk_id);
+    return `<tr>
+      <td style="${tdStyle};font-family:monospace;font-size:11px">${c.chunk_id||''}</td>
+      <td style="${tdStyle};font-size:12px">${c.source||''}</td>
+      <td style="${tdStyle};font-size:11px">${sim}%</td>
+      <td style="${tdStyle};font-weight:600;color:${cited?'#16A34A':'#9CA3AF'}">${cited?'✓ Cited':'Not cited'}</td>
+      <td style="${tdStyle};font-size:11px;max-width:320px;color:#374151">${(c.content||'').slice(0,200)}${c.content?.length>200?'…':''}</td>
+    </tr>`;
+  }).join('');
+
+  const spanRows = (trace.spans||[]).map(sp => `<tr>
+    <td style="${tdStyle};font-weight:600">${sp.name||''}</td>
+    <td style="${tdStyle}">${sp.duration_ms||0}ms</td>
+    <td style="${tdStyle};font-size:12px;color:#6B7280">${sp.status||''}</td>
+  </tr>`).join('');
+
+  const flagsList = (trace.flags||[]).map(f => `<li style="margin-bottom:4px">${f}</li>`).join('');
+
+  const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>EyeOnAI Report — ${trace.trace_id}</title>
+<style>
+  body { font-family: system-ui, -apple-system, sans-serif; background: #FAFAF9; color: #1A1A1A; padding: 40px 32px; max-width: 900px; margin: 0 auto; line-height: 1.5; }
+  h1 { font-size: 22px; font-weight: 800; letter-spacing: -0.03em; margin-bottom: 4px; }
+  h2 { font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: #6B7280; margin: 28px 0 10px; border-bottom: 1px solid #E8E6E1; padding-bottom: 6px; }
+  .meta { font-size: 12px; color: #6B7280; margin-bottom: 28px; }
+  .card { background: #fff; border: 1px solid #E8E6E1; border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .verdict { display: inline-block; padding: 3px 12px; border-radius: 20px; font-size: 12px; font-weight: 700; }
+  .v-PASS { background: #F0FDF4; color: #16A34A; border: 1px solid #BBF7D0; }
+  .v-FAIL { background: #FEF2F2; color: #DC2626; border: 1px solid #FECACA; }
+  .v-REVIEW { background: #FFFBEB; color: #D97706; border: 1px solid #FDE68A; }
+  .score-big { font-size: 36px; font-weight: 800; }
+  .lbl { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: #6B7280; margin-bottom: 3px; }
+  .qa-q { font-size: 17px; font-weight: 600; color: #1A1A1A; margin-bottom: 12px; }
+  .qa-a { font-size: 13px; color: #374151; line-height: 1.75; background: #F5F4F1; padding: 12px 14px; border-radius: 8px; }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 12px; }
+  .metric { background: #F5F4F1; border-radius: 8px; padding: 10px 12px; }
+  .metric-val { font-size: 22px; font-weight: 700; }
+  .metric-lbl { font-size: 10px; color: #6B7280; text-transform: uppercase; letter-spacing: .05em; font-weight: 600; margin-bottom: 2px; }
+  footer { font-size: 11px; color: #9CA3AF; margin-top: 40px; text-align: center; padding-top: 16px; border-top: 1px solid #E8E6E1; }
+</style>
+</head>
+<body>
+<h1>EyeOnAI Observability Report</h1>
+<p class="meta">${new Date(trace.timestamp).toLocaleString()} · ${trace.trace_id} · ${trace.total_duration_ms}ms · $${(trace.cost_estimate||0).toFixed(4)}</p>
+
+<div class="card">
+  <div class="lbl">Question</div>
+  <div class="qa-q">${trace.question}</div>
+  <div class="lbl">Answer</div>
+  <div class="qa-a">${trace.answer}</div>
+</div>
+
+<h2>Trust Score</h2>
+<div class="card" style="display:flex;align-items:center;gap:20px">
+  <div>
+    <div class="score-big" style="color:${overall>=.85?'#16A34A':overall>=.70?'#D97706':'#DC2626'}">${(overall*100).toFixed(0)}<span style="font-size:16px;font-weight:400;color:#9CA3AF">/100</span></div>
+    <div style="font-size:11px;color:#6B7280">Weighted Trust Score</div>
+  </div>
+  <span class="verdict v-${verdict}">${verdict}</span>
+  <div style="font-size:11px;color:#6B7280;line-height:1.8;margin-left:12px">
+    Groundedness 20% · Hallucination 20% · Relevance 15% · Safety 15%<br>
+    Clarity 10% · Cost 10% · Citation 5% · Completeness 5%
+  </div>
+</div>
+
+<h2>Agent Evaluation — Layer 2 (Independent LLM Evaluator)</h2>
+<div class="card">
+  <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px">
+    <span class="verdict v-${verdict}" style="font-size:14px;padding:5px 16px">${verdict}</span>
+    <span style="font-size:12px;color:#6B7280">Model: ${ev.model_used||'evaluator'} · ${ev.latency_ms||0}ms · ${ev.tokens_used||0} tokens</span>
+  </div>
+  <p style="font-size:13px;line-height:1.7;margin-bottom:14px;color:#374151">${ev.summary||''}</p>
+  <div style="margin-bottom:14px;padding:8px 12px;background:#F5F4F1;border-radius:8px;font-size:11px;color:#6B7280">
+    Evaluator Score: <strong style="font-size:18px;font-weight:800;color:${(ev.evaluator_score||0)>=85?'#16A34A':(ev.evaluator_score||0)>=70?'#D97706':'#DC2626'}">${ev.evaluator_score||0}</strong><span style="color:#9CA3AF">/100</span>
+    &nbsp;·&nbsp; Groundedness 20% · Hallucination 20% · Relevance 15% · Safety 15% · Clarity 10% · Citation 10% · Completeness 10%
+  </div>
+  <table style="${tableStyle}">
+    <thead><tr>
+      <th style="${thStyle}">Metric</th><th style="${thStyle}">Score</th><th style="${thStyle}">Evaluator Reasoning</th>
+    </tr></thead>
+    <tbody>
+      ${[
+        ['Groundedness',      ev.groundedness_score,       ev.groundedness_reason],
+        ['Hallucination',     ev.hallucination_score,      ev.hallucination_reason],
+        ['Relevance',         ev.relevance_score,          ev.relevance_reason],
+        ['Safety',            ev.safety_score,             ev.safety_reason],
+        ['Clarity',           ev.clarity_score,            ev.clarity_reason],
+        ['Citation Integrity',ev.citation_integrity_score, ev.citation_integrity_reason],
+        ['Completeness',      ev.completeness_score,       ev.completeness_reason],
+      ].map(([lbl, sc, reason]) => {
+        const s = sc || 0;
+        const col = s >= .8 ? '#16A34A' : s >= .55 ? '#D97706' : '#DC2626';
+        return `<tr><td style="${tdStyle};font-weight:600">${lbl}</td><td style="${tdStyle};font-weight:700;color:${col}">${pct(s)}</td><td style="${tdStyle}">${reason||''}</td></tr>`;
+      }).join('')}
+    </tbody>
+  </table>
+  ${(()=>{ const m=(ev.missed_by_rules||'').trim(); return m && !['none','nothing','n/a'].includes(m.toLowerCase()) ? `<div style="margin-top:12px;padding:10px 12px;background:#FFF7ED;border:1px solid #FED7AA;border-radius:8px;font-size:12px"><strong style="color:#D97706">Caught by evaluator, missed by rules:</strong><br>${m}</div>` : ''; })()}
+</div>
+
+<h2>Mathematical Evaluation — Rules Engine</h2>
+<div class="card">
+  <div class="grid2">
+    ${['Groundedness','Hallucination Risk','Cost Efficiency','Citation Integrity','Response Completeness'].map((lbl,i) => {
+      const keys = ['groundedness','hallucination_risk','cost_efficiency','citation_integrity','response_completeness'];
+      const v = rules[keys[i]]||0;
+      const display = keys[i]==='hallucination_risk' ? 1-v : v;
+      const col = display>=.8?'#16A34A':display>=.55?'#D97706':'#DC2626';
+      return `<div class="metric"><div class="metric-lbl">${lbl}</div><div class="metric-val" style="color:${col}">${(display*100).toFixed(0)}%</div></div>`;
+    }).join('')}
+  </div>
+</div>
+
+${chunks.length ? `
+<h2>Evidence Trail (${chunks.length} chunk${chunks.length!==1?'s':''})</h2>
+<div class="card" style="padding:0">
+  <table style="${tableStyle};margin:0;border-radius:10px;overflow:hidden">
+    <thead><tr>
+      <th style="${thStyle}">Chunk ID</th>
+      <th style="${thStyle}">Source</th>
+      <th style="${thStyle}">Similarity</th>
+      <th style="${thStyle}">Cited</th>
+      <th style="${thStyle}">Content Preview</th>
+    </tr></thead>
+    <tbody>${chunkRows}</tbody>
+  </table>
+</div>` : `
+<h2>Evidence Trail</h2>
+<div class="card" style="background:#FFFBEB;border-left:3px solid #D97706">
+  <p style="font-size:13px;color:#D97706;font-weight:500">No chunks retrieved for this query — groundedness scores reflect this.</p>
+</div>`}
+
+<h2>Confidence Assessment — Layer Agreement</h2>
+<div class="card">
+  <div style="display:flex;gap:24px;align-items:flex-start;margin-bottom:12px">
+    <div class="metric" style="flex:1"><div class="metric-lbl">Rules Engine</div><div class="metric-val" style="color:${(ca.rules_implied_quality||0)>=.7?'#16A34A':'#D97706'}">${((ca.rules_implied_quality||0)*100).toFixed(0)}</div><div style="font-size:10px;color:#9CA3AF">avg(groundedness, 1−hallucination)</div></div>
+    <div class="metric" style="flex:1"><div class="metric-lbl">Evaluator Agent</div><div class="metric-val" style="color:${(ca.evaluator_implied_quality||0)>=.7?'#16A34A':'#D97706'}">${((ca.evaluator_implied_quality||0)*100).toFixed(0)}</div><div style="font-size:10px;color:#9CA3AF">avg(relevance, safety, clarity)</div></div>
+    <div style="flex:2;padding:10px 12px;background:${ca.level==='HIGH'?'#F0FDF4':'#FFFBEB'};border-radius:8px;border:1px solid ${ca.level==='HIGH'?'#BBF7D0':'#FDE68A'}">
+      <div style="font-weight:700;color:${ca.level==='HIGH'?'#16A34A':'#D97706'};font-size:12px">${ca.level==='HIGH'?'HIGH CONFIDENCE — Both layers agree':'LOW CONFIDENCE — Layers disagree'}</div>
+      <div style="font-size:11px;color:#6B7280;margin-top:4px">Δ ${((ca.delta||0)*100).toFixed(0)} points · threshold: 25</div>
+    </div>
+  </div>
+  <p style="font-size:13px;color:#374151">${ca.interpretation||''}</p>
+</div>
+
+${(ca.disagreement_analyses||[]).length && ca.level==='LOW' ? `
+<h2>Disagreement Root-Cause Analysis</h2>
+<div class="card">
+  <p style="font-size:11px;color:#6B7280;margin:0 0 14px">Why the two scoring layers disagree — computed from NLI evidence, sentence verdicts, and evaluator reasoning.</p>
+  ${(ca.disagreement_analyses).map(a => {
+    const causeLabels = {
+      fluency_vs_grounding_gap:    'Fluency vs Grounding Gap',
+      evaluator_overcaution:       'Evaluator Overcaution',
+      scope_mismatch:              'Scope Mismatch',
+      format_vs_substance:         'Format vs Substance',
+      missing_attribution_phrases: 'Missing Attribution Phrases',
+      length_vs_substance:         'Length vs Substance',
+    };
+    const dimLabel = a.dimension.replace(/_/g,' ').replace(/\b\w/g,c=>c.toUpperCase());
+    const dirColor = a.direction==='evaluator_higher' ? '#7C3AED' : '#0D9488';
+    const evid = (a.evidence||[]);
+    return `<div style="border:1px solid #E8E6E1;border-radius:10px;padding:14px 16px;margin-bottom:12px">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+        <span style="font-size:13px;font-weight:700;color:#1A1A1A">${dimLabel}</span>
+        <span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;background:#F0FDF4;color:#0D9488;border:1px solid #BBF7D0">Rules ${(a.rules_score*100).toFixed(0)}%</span>
+        <span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;background:#F5F3FF;color:#7C3AED;border:1px solid #DDD6FE">Eval ${(a.evaluator_score*100).toFixed(0)}%</span>
+        <span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;background:#FFFBEB;color:#D97706;border:1px solid #FDE68A">Δ ${(a.delta*100).toFixed(0)}pt</span>
+      </div>
+      <div style="padding:10px 12px;background:#FFFBEB;border:1px solid #FDE68A;border-radius:8px;font-size:12px;color:#374151;line-height:1.65;margin-bottom:${evid.length?'10px':'0'}">
+        ${a.explanation||''}
+      </div>
+      ${evid.length ? `<div style="margin-top:8px">
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#6B7280;margin-bottom:6px">Unsupported claims (${evid.length})</div>
+        ${evid.map(e => `<div style="padding:8px 10px;background:#FEF2F2;border-left:3px solid #FECACA;border-radius:0 6px 6px 0;margin-bottom:6px;font-size:12px">
+          <span style="color:#374151">${e.sentence||''}</span>
+          <span style="margin-left:8px;color:#9CA3AF;font-size:11px">entailment ${((e.entailment||0)*100).toFixed(0)}%</span>
+          ${(e.claims||[]).length ? `<span style="margin-left:6px;color:#D97706;font-size:11px">${e.claims.map(c=>c.claim||c).join(' · ')}</span>` : ''}
+        </div>`).join('')}
+      </div>` : ''}
+      ${a.likely_cause ? `<div style="margin-top:8px">
+        <span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#6B7280">Pattern: </span>
+        <span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:8px;background:#F1F5F9;color:#475569;border:1px solid #CBD5E1">${causeLabels[a.likely_cause]||a.likely_cause}</span>
+      </div>` : ''}
+    </div>`;
+  }).join('')}
+</div>` : ''}
+
+${sa.length ? `
+<h2>Deep Verification — Sentence-by-Sentence Analysis</h2>
+<div class="card" style="padding:0">
+  <table style="${tableStyle};margin:0;border-radius:10px;overflow:hidden">
+    <thead><tr>
+      <th style="${thStyle}">Sentence</th>
+      <th style="${thStyle}">Verdict</th>
+      <th style="${thStyle}">Entailment</th>
+      <th style="${thStyle}">Claims</th>
+    </tr></thead>
+    <tbody>${saRows}</tbody>
+  </table>
+</div>` : ''}
+
+${flagsList ? `
+<h2>Quality Flags</h2>
+<div class="card"><ul style="margin:0;padding-left:20px;font-size:13px;line-height:2">${flagsList}</ul></div>` : ''}
+
+${spanRows ? `
+<h2>Pipeline Steps</h2>
+<div class="card" style="padding:0">
+  <table style="${tableStyle};margin:0;border-radius:10px;overflow:hidden">
+    <thead><tr>
+      <th style="${thStyle}">Step</th><th style="${thStyle}">Duration</th><th style="${thStyle}">Status</th>
+    </tr></thead>
+    <tbody>${spanRows}</tbody>
+  </table>
+</div>` : ''}
+
+<footer>Generated by EyeOnAI Observability Platform · ${new Date().toLocaleString()}</footer>
+</body></html>`;
+
+  const blob = new Blob([html], {type:'text/html'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `eyeonai-report-${traceId}.html`;
+  a.click();
+}
+
+// ─── Dashboard ────────────────────────────────────────────────────────────────
+async function loadDashboard() {
+  dashboardLoaded = true;
+  const [dashRes, fabricRes] = await Promise.all([
+    fetch('/api/dashboard'), fetch('/api/fabric-insights')]);
+  const dash   = await dashRes.json();
+  const fabric = await fabricRes.json();
+  renderDashboard(dash, fabric);
+}
+
+function renderDashboard(dash, fabric) {
+  const s = dash.stats||{};
+  const scoreColor = (s.avg_score||0)>=.85?'stat-green':(s.avg_score||0)>=.70?'stat-yellow':'stat-red';
+  const flagColor  = (s.flagged_pct||0)<15?'stat-green':(s.flagged_pct||0)<30?'stat-yellow':'stat-red';
+  let html = `<h2 style="font-size:18px;font-weight:700;margin-bottom:20px;letter-spacing:-0.02em">Answer Quality Dashboard</h2>
+    <div class="stats-row">
+      <div class="stat-card"><div class="stat-val stat-blue">${s.total||0}</div><div class="stat-label">Total Queries</div></div>
+      <div class="stat-card"><div class="stat-val ${flagColor}">${s.flagged_pct||0}%</div><div class="stat-label">Flagged Rate</div><div class="stat-sub">${s.flagged_count||0} flagged</div></div>
+      <div class="stat-card"><div class="stat-val ${scoreColor}">${((s.avg_score||0)*100).toFixed(0)}</div><div class="stat-label">Avg Quality</div></div>
+      <div class="stat-card"><div class="stat-val stat-blue">$${((s.avg_cost_usd||0)*1000).toFixed(2)}<span style="font-size:13px;font-weight:400;color:var(--muted)">/1k</span></div><div class="stat-label">Avg Cost</div></div>
+    </div>
+    <div class="section-title2">Fabric IQ Insights</div>
+    <div style="font-size:11px;color:var(--muted);margin-bottom:10px">${esc(fabric.semantic_summary||'')}</div>
+    <div class="insights-row">
+      ${(fabric.insights||[]).map(ins=>`<div class="insight-card insight-${ins.severity}">
+        <div class="insight-title">${esc(ins.title)}</div>
+        <div class="insight-detail">${esc(ins.detail)}</div>
+      </div>`).join('')}
+    </div>
+    <div class="section-title2">Flagged Answers</div>
+    <div class="filter-bar">
+      <label>Filter by flag:</label>
+      <select id="flag-filter" onchange="filterTable()">
+        <option value="">All flags</option>
+        ${[...new Set((dash.flagged||[]).flatMap(t=>(t.flags||[]).map(f=>f.split(':')[0])))].map(r=>
+          `<option value="${r}">${r.replace(/_/g,' ')}</option>`).join('')}
+      </select>
+      <span class="result-count" id="result-count">${(dash.flagged||[]).length} flagged</span>
+    </div>
+    <div id="table-container">${buildFlaggedTable(dash.flagged||[])}</div>`;
+  document.getElementById('dash-inner').innerHTML = html;
+  window._allFlagged = dash.flagged||[];
+}
+
+function buildFlaggedTable(rows) {
+  if (!rows.length) return `<div class="table-wrap"><div class="empty-table">No flagged answers</div></div>`;
+  let html = `<div class="table-wrap"><table><thead><tr>
+    <th>Question</th><th>Intent</th><th>Score</th><th>Verdict</th><th>Flag</th><th>Cost</th><th>Time</th>
+    </tr></thead><tbody>`;
+  rows.forEach(t => {
+    const score = t.quality_scores?.overall||0;
+    const col = score>=.85?'var(--success)':score>=.70?'var(--warning)':'var(--danger)';
+    const verdict = t.evaluator_scores?.verdict||t.quality_scores?.verdict||'';
+    const pills = (t.flags||[]).map(f=>`<span class="flag-pill">${esc(f.split(':')[0].replace(/_/g,' '))}</span>`).join('<br>');
+    const ts = new Date(t.timestamp).toLocaleString([],{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'});
+    html += `<tr onclick="openTraceFromDash('${t.trace_id}')">
+      <td class="td-question"><div class="td-question-text">${esc(t.question)}</div></td>
+      <td><span class="td-intent intent-${t.intent||'general'}">${t.intent||'general'}</span></td>
+      <td style="font-weight:700;color:${col}">${(score*100).toFixed(0)}</td>
+      <td>${verdict?`<span class="verdict-badge verdict-${verdict}">${verdict}</span>`:''}</td>
+      <td>${pills}</td>
+      <td style="color:var(--text2)">$${((t.cost_estimate||0)*1000).toFixed(3)}</td>
+      <td style="color:var(--muted)">${ts}</td>
+    </tr>`;
+  });
+  return html + '</tbody></table></div>';
+}
+
+function filterTable() {
+  const val = document.getElementById('flag-filter').value;
+  const filtered = val ? (window._allFlagged||[]).filter(t=>(t.flags||[]).some(f=>f.startsWith(val))) : (window._allFlagged||[]);
+  document.getElementById('table-container').innerHTML = buildFlaggedTable(filtered);
+  document.getElementById('result-count').textContent = `${filtered.length} flagged`;
+}
+
+async function openTraceFromDash(traceId) {
+  switchTab('chat');
+  await openReport(traceId);
+}
+
+// ─── Toast ────────────────────────────────────────────────────────────────────
+let _toastTimer = null;
+function showToast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.classList.add('show');
+  clearTimeout(_toastTimer);
+  _toastTimer = setTimeout(() => el.classList.remove('show'), 3000);
+}
+
+function esc(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// Init
+(async function() {
+  try {
+    const res = await fetch('/api/traces');
+    const summaries = await res.json();
+    summaries.forEach(t => { allTraces[t.trace_id] = t; });
+  } catch(e) {}
+})();
+</script>
+</body>
+</html>

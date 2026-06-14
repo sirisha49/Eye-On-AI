@@ -1,0 +1,28 @@
+# Secrets — never commit
+.env
+
+# Python
+__pycache__/
+**/__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+venv/
+.venv/
+
+# macOS
+.DS_Store
+**/.DS_Store
+
+# Runtime trace data (generated at runtime, not part of source)
+traces/
+
+# Local-only test harnesses (non-Azure providers) — not part of production architecture
+backend/test_with_claude.py
+backend/test_with_gemini.py
+backend/test_with_groq.py
+
+# IDE
+.vscode/
+.idea/
+*.swp
