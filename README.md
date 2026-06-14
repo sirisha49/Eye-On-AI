@@ -33,7 +33,7 @@ The result: one final verdict — **Pass, Review, or Fail** — backed by a full
 
 ## Architecture
 
-![EyeOnAI Architecture](Architecture.png)
+![EyeOnAI Architecture](output/Architecture.png)
 
 ---
 
@@ -97,7 +97,7 @@ The overall verdict is derived from the **trust score** directly — not from th
 
 ## Scoring Methodology
 
-![Scoring Methodology](combined_layers.png)
+![Scoring Methodology](output/combined_layers.png)
 
 ### Layer 1 — Rules Engine *(deterministic, no LLM)*
 
