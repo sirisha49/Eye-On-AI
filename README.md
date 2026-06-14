@@ -81,6 +81,21 @@ Aggregate trends across all traces, powered by Fabric IQ.
 
 ---
 
+### Downloadable Report
+
+Every answer comes with a full, self-contained HTML report you can download and share. It includes:
+
+- **Trust score** — overall weighted score with Pass / Review / Fail verdict
+- **Agent Evaluation (Layer 2)** — per-dimension scores and the evaluator's full written reasoning for each dimension (Groundedness, Hallucination, Relevance, Safety, Clarity, Citation, Completeness)
+- **Mathematical Evaluation (Layer 1)** — rules engine scores across all 5 dimensions
+- **Comparison summary** — delta between the two layers, confidence level, and pattern classification
+- **Evidence trail** — every retrieved chunk used, with source name, similarity score, and whether it was cited
+- **Sentence-level verification** — each sentence in the answer marked Supported, Unverified, or Contradiction
+
+A sample report is included in the [`Output/`](Output/OverAll%20Report.html) folder.
+
+---
+
 ## Verdict Logic
 
 The overall verdict is derived from the **trust score** directly — not from the evaluator's raw binary judgment, which is calibrated to be strict and would otherwise over-trigger "Fail":
