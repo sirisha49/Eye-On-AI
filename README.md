@@ -92,7 +92,7 @@ Every answer comes with a full, self-contained HTML report you can download and 
 - **Evidence trail** — every retrieved chunk used, with source name, similarity score, and whether it was cited
 - **Sentence-level verification** — each sentence in the answer marked Supported, Unverified, or Contradiction
 
-A sample report is included in the [`Output/`](Output/OverAll%20Report.html) folder.
+A sample report is included in the [`Output/`](Output/OverAll%20Report.pdf) folder.
 
 ---
 
